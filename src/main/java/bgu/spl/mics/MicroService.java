@@ -133,7 +133,6 @@ public abstract class MicroService implements Runnable {
     protected final void terminate() {
         this.terminated = true;
     }
-
     /**
      * @return the name of the service - the service name is given to it in the
      *         construction time and is used mainly for debugging purposes.
