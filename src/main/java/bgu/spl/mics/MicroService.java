@@ -1,4 +1,5 @@
 package bgu.spl.mics;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The MicroService is an abstract class that any micro-service in the system
@@ -156,7 +157,6 @@ public abstract class MicroService implements Runnable {
             while (!terminated) {
                 Message<?> message = messageBus.awaitMessage(this); // Wait for a message
                 if (message != null) {
-                    @SuppressWarnings("unchecked")
                     Callback<Message<?>> callback = (Callback<Message<?>>) callbacks.get(message.getClass());
                     if (callback != null) {
                         callback.call(message); // Execute the callback
