@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * message-queue (see {@link MessageBus#register(bgu.spl.mics.MicroService)}
  * method). The abstract MicroService stores this callback together with the
  * type of the message is related to.
- * 
+ *
  * Only private fields and methods may be added to this class.
  * <p>
  */
@@ -151,22 +151,22 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        try {
-            messageBus.register(this);
-            initialize();
-            while (!terminated) {
-                Message<?> message = messageBus.awaitMessage(this); // Wait for a message
-                if (message != null) {
-                    Callback<Message<?>> callback = (Callback<Message<?>>) callbacks.get(message.getClass());
-                    if (callback != null) {
-                        callback.call(message); // Execute the callback
-                    }
-                }
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } finally {
-            messageBus.unregister(this); // Unregister from the MessageBus
-        }
+//        try {
+//            messageBus.register(this);
+//            initialize();
+//            while (!terminated) {
+//                Message<?> message = messageBus.awaitMessage(this); // Wait for a message
+//                if (message != null) {
+//                    Callback<Message<?>> callback = (Callback<Message<?>>) callbacks.get(message.getClass());
+//                    if (callback != null) {
+//                        callback.call(message); // Execute the callback
+//                    }
+//                }
+//            }
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        } finally {
+//            messageBus.unregister(this); // Unregister from the MessageBus
+//        }
     }
 }

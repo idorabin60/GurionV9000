@@ -8,13 +8,16 @@
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/MicroService.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/GurionRockRunner.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/Camera.java
+/Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/CameraDataLoader.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/CloudPoint.java
+/Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/Configuration.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/DetectedObject.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/FusionSlam.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/GPSIMU.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/LandMark.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/LiDarDataBase.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/LiDarWorkerTracker.java
+/Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/Main.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/Pose.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/STATUS.java
 /Users/idorabin/spl3/GurionV9000/src/main/java/bgu/spl/mics/application/objects/StampedCloudPoints.java

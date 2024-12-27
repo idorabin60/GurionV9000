@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class MessageBusImpl implements MessageBus {
     private final ConcurrentHashMap<MicroService, BlockingQueue<Message>> microServiceMessageQueue;
-    private final ConcurrentHashMap<Class<? extends Broadcast>, CopyOnWriteArrayList<MicroService>> broadcastSubscriptions;
+    private final ConcurrentHashMap<Class<? extends Broadcast>, CopyOnWriteArrayList<MicroService>> broadcastSubscriptions; //mabye it should
     private final ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> eventSubscriptions;
     private final ConcurrentHashMap<Event<?>, Future<?>> eventFutureMap;
     private static MessageBusImpl instance;
@@ -26,11 +26,12 @@ public class MessageBusImpl implements MessageBus {
 
 
     private MessageBusImpl() {
-        microServiceMessageQueue = new ConcurrentHashMap<>();
-        broadcastSubscriptions = new ConcurrentHashMap<>();
+        microServiceMessageQueue = new ConcurrentHashMap<>();//       broadcastSubscriptions = new ConcurrentHashMap<>();
         eventSubscriptions = new ConcurrentHashMap<>();
         eventFutureMap = new ConcurrentHashMap<>();
+        broadcastSubscriptions = new ConcurrentHashMap<>();
     }
+
     //NEED TO CHANGE IT LIKE IN PS8
     public static MessageBusImpl getInstance() {
         if (instance == null) { // First check (no locking)
