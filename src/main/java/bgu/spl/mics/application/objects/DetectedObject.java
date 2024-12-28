@@ -27,4 +27,3 @@ public class DetectedObject {
         return "DetectedObject{id='" + id + "', description='" + description + "'}";
     }
 }
-//DONE

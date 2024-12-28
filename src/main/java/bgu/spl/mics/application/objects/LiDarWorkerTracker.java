@@ -9,7 +9,7 @@ import java.util.List;
  * Each worker tracks objects and sends observations to the FusionSlam service.
  */
 public class LiDarWorkerTracker {
-    private int id;
+    private final int id;
     private int frequency;
     private STATUS status;
     private List<TrackedObject> lastTrackedObjects;
