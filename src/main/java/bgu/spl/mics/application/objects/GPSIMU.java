@@ -1,6 +1,5 @@
 package bgu.spl.mics.application.objects;
 
-import java.io.ObjectInputFilter.Status;
 import java.util.ArrayList;
 
 /**
@@ -14,7 +13,7 @@ public class GPSIMU {
 
     public GPSIMU() {
         this.currentTick = 0;
-        this.status =STATUS.UP; ; // check if true
+        this.status =STATUS.UP; // check if true
         this.PoseList = new ArrayList<>();
     }
 
