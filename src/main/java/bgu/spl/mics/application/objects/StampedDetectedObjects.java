@@ -10,6 +10,10 @@ public class StampedDetectedObjects {
     private int time; // The tick timestamp
     private List<DetectedObject> detectedObjects; // List of detected objects
 
+    public StampedDetectedObjects(int time, List<DetectedObject> detectedObjects) {
+        this.time = time;
+        this.detectedObjects = detectedObjects;
+    }
     // Getters
     public int getTime() {
         return time;
