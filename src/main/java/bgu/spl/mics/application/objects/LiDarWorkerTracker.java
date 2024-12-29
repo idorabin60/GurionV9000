@@ -57,5 +57,6 @@ public class LiDarWorkerTracker {
         this.frequency = frequency;
     }
 
+
     // TODO: Define fields and methods.
 }
