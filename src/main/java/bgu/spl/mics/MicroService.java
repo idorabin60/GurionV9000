@@ -1,4 +1,6 @@
 package bgu.spl.mics;
+import bgu.spl.mics.application.objects.StatisticalFolder;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -23,8 +25,9 @@ public abstract class MicroService implements Runnable {
 
     private boolean terminated = false;
     private final String name;
-    private final ConcurrentHashMap<Class<?>, Callback<?>> callbacks; // Maps message types to their callbacks
-    private final MessageBus messageBus; // Reference to the MessageBus singleton
+    private ConcurrentHashMap<Class<?>, Callback<?>> callbacks; // Maps message types to their callbacks
+    private MessageBus messageBus; // Reference to the MessageBus singleton
+    protected StatisticalFolder statisticalFolder;
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
@@ -33,7 +36,10 @@ public abstract class MicroService implements Runnable {
         this.name = name;
         this.callbacks = new ConcurrentHashMap<>(); // Initialize the callbacks map
         this.messageBus = MessageBusImpl.getInstance(); // Assuming MessageBusImpl is a singleton
+        this.statisticalFolder = StatisticalFolder.getInstance();
     }
+
+
     /**
      * Subscribes to events of type {@code type} with the callback
      * {@code callback}. This means two things:
@@ -155,9 +161,9 @@ public abstract class MicroService implements Runnable {
             messageBus.register(this);
             initialize();
             while (!terminated) {
-                Message<?> message = messageBus.awaitMessage(this); // Wait for a message
+                Message<T> message = messageBus.awaitMessage(this); // Wait for a message
                 if (message != null) {
-                    Callback<Message<?>> callback = (Callback<Message<?>>) callbacks.get(message.getClass());
+                    Callback<Message<T>> callback = (Callback<Message<T>>) callbacks.get(message.getClass());
                     if (callback != null) {
                         callback.call(message); // Execute the callback
                     }

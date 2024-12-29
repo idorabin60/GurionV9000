@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.objects;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * Manages the fusion of sensor data for simultaneous localization and mapping (SLAM).
@@ -9,21 +10,21 @@ import java.util.Arrays;
  */
 public class FusionSlam {
         // Fields
-        private LandMark[] landmarks; // Represents the map of the environment
+        private ArrayList<LandMark> landmarks; // Represents the map of the environment
         private List<Pose> poses;     // Represents previous poses needed for calculations
 
         // Constructor
-        public FusionSlam(LandMark[] landmarks, List<Pose> poses) {
+        public FusionSlam(ArrayList<LandMark> landmarks, List<Pose> poses) {
             this.landmarks = landmarks;
             this.poses = poses;
         }
 
         // Getters and Setters
-        public LandMark[] getLandmarks() {
+        public ArrayList<LandMark> getLandmarks() {
             return landmarks;
         }
 
-        public void setLandmarks(LandMark[] landmarks) {
+        public void setLandmarks(ArrayList<LandMark> landmarks) {
             this.landmarks = landmarks;
         }
 

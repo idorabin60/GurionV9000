@@ -13,12 +13,15 @@ public class Camera {
     private final int frequency;
     private STATUS status;
     private List<StampedDetectedObjects> detectedObjectsList;
+    private final int lastDuration; //the time of the last detectedObject
 
     public Camera(int id, int frequency, STATUS status) {
         this.id = id;
         this.frequency = frequency;
         this.status = status;
         this.detectedObjectsList = new ArrayList<>();
+        lastDuration= 20; //ASK IDO- CHANGE TO THE ACTUAL FROM CONFIG
+        //IDO I WANT THAT IF IN THE INITAIOZION THR LIST IS EMPTY DO THAT THIS IS -1
     }
 
     // Getter for id
@@ -36,6 +39,9 @@ public class Camera {
         return status;
     }
 
+    public int getLastDuration(){
+        return lastDuration;
+    }
     // Setter for status
     public void setStatus(STATUS status) {
         this.status = status;
@@ -46,7 +52,7 @@ public class Camera {
         return detectedObjectsList;
     }
 
-    public StampedDetectedObjects getLastDetectedObjectAtTimeT(int timeT) {
+    public StampedDetectedObjects getDetectedObjectAtTimeT(int timeT) {
         if (timeT<0){
             return null;
         }

@@ -16,7 +16,7 @@ public class Main {
         // Print updated cameras
         for (Camera camera : cameras) {
             System.out.println("hi ido");
-            System.out.println(camera.getLastDetectedObjectAtTimeT(2));
+            System.out.println(camera.getDetectedObjectAtTimeT()DetectedObjectAtTimeT(2));
             System.out.println("Camera ID: " + camera.getId());
             System.out.println("Detected Objects: " + camera.getDetectedObjectsList());
         }

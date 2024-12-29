@@ -49,7 +49,7 @@ public class TimeService extends MicroService {
             }
 
             // Send TerminateBroadcast after all ticks
-            sendBroadcast(new TerminatedBroadcast());
+            sendBroadcast(new TerminatedBroadcast("TimeService"));
             terminate();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
