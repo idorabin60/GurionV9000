@@ -47,6 +47,9 @@ public class Camera {
     }
 
     public StampedDetectedObjects getLastDetectedObjectAtTimeT(int timeT) {
+        if (timeT<0){
+            return null;
+        }
         for (StampedDetectedObjects detectedObject : detectedObjectsList) {
             if (detectedObject.getTime() == timeT) {
                 return detectedObject;
