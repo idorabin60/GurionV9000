@@ -46,13 +46,23 @@ public class Camera {
         return detectedObjectsList;
     }
 
-    // Setter for detectedObjectsList
-    public void setDetectedObjectsList(List<StampedDetectedObjects> detectedObjectsList) {
-        this.detectedObjectsList = detectedObjectsList;
+    public StampedDetectedObjects getLastDetectedObjectAtTimeT(int timeT) {
+        for (StampedDetectedObjects detectedObject : detectedObjectsList) {
+            if (detectedObject.getTime() == timeT) {
+                return detectedObject;
+            }
+        }
+        return null;
     }
+        // Setter for detectedObjectsList
 
-    // Method to add a single detected object
-    public void addDetectedObject(StampedDetectedObjects detectedObject) {
-        this.detectedObjectsList.add(detectedObject);
+
+        // Method to add a single detected object
+
+        public void updateDetectedObjects(List<StampedDetectedObjects> newDetectedObjects) {
+            if (newDetectedObjects == null) {
+                throw new IllegalArgumentException("Detected objects list cannot be null");
+            }
+            this.detectedObjectsList = newDetectedObjects;
+        }
     }
-}

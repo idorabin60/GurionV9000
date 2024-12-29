@@ -1,6 +1,27 @@
 package bgu.spl.mics.application.messages;
 
-import bgu.spl.mics.Future;
+import bgu.spl.mics.Event;
+import bgu.spl.mics.application.objects.DetectedObject;
+import bgu.spl.mics.application.objects.Pose;
+import bgu.spl.mics.application.objects.StampedDetectedObjects;
+import bgu.spl.mics.application.objects.TrackedObject;
 
-public class DetectObjectsEvent implements Event<Boolean>{
+import java.util.List;
+
+public class DetectObjectsEvent implements Event<List<TrackedObject>> {
+
+    private final StampedDetectedObjects stampedDetectedObjectInCertinTimeByCertinCamera;
+
+    public DetectObjectsEvent(StampedDetectedObjects stampedDetectedObjectInCertinTimeByCertinCamera) {
+        this.stampedDetectedObjectInCertinTimeByCertinCamera = stampedDetectedObjectInCertinTimeByCertinCamera;
+    }
+
+    public List<DetectedObject> getDetectedObjects() {
+        return stampedDetectedObjectInCertinTimeByCertinCamera.getDetectedObjects();
+    }
+
+    public int getTime() {
+        return stampedDetectedObjectInCertinTimeByCertinCamera.getTime();
+    }
+
 }
