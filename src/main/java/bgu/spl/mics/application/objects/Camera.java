@@ -13,15 +13,14 @@ public class Camera {
     private final int frequency;
     private STATUS status;
     private List<StampedDetectedObjects> detectedObjectsList;
-    private final int lastDuration; //the time of the last detectedObject
+    private int lifeCycle;
 
     public Camera(int id, int frequency, STATUS status) {
         this.id = id;
         this.frequency = frequency;
         this.status = status;
         this.detectedObjectsList = new ArrayList<>();
-        lastDuration= 20; //ASK IDO- CHANGE TO THE ACTUAL FROM CONFIG
-        //IDO I WANT THAT IF IN THE INITAIOZION THR LIST IS EMPTY DO THAT THIS IS -1
+        this.lifeCycle=0;
     }
 
     // Getter for id
@@ -39,8 +38,8 @@ public class Camera {
         return status;
     }
 
-    public int getLastDuration(){
-        return lastDuration;
+    public int getLifeCycle(){
+        return lifeCycle;
     }
     // Setter for status
     public void setStatus(STATUS status) {
@@ -73,5 +72,6 @@ public class Camera {
                 throw new IllegalArgumentException("Detected objects list cannot be null");
             }
             this.detectedObjectsList = newDetectedObjects;
+            this.lifeCycle=newDetectedObjects.size();
         }
     }

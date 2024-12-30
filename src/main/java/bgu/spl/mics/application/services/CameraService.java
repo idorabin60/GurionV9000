@@ -57,13 +57,11 @@ public class CameraService extends MicroService {
         // Subscribe to TickBroadcast
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             currentTick = tick.getCurrentTick();
-            if (camera.getLastDuration() < currentTick){
+            if (camera.getLifeCycle()<1){
                 //if there is no data or the list is empty
                 camera.setStatus(STATUS.DOWN);
                 terminate();
                 sendBroadcast(new TerminatedBroadcast(getName()));
-            }
-            else if(camera.getStatus() == STATUS.ERROR) {
             }
             else { //there is data to read and status = up
                 StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick-camera.getFrequency());
