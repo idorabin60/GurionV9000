@@ -47,8 +47,8 @@ public class CameraService extends MicroService {
         System.out.println(getName() + " for camera " + camera.getId() + " started");
 
         //Subscribe to TerminateBroadcast
-        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast terb) -> {
-           if (terb.getSender().equals("TimeService")) {
+        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
+           if (termBrocast.getSender().equals("TimeService")) {
                camera.setStatus(STATUS.DOWN);
                terminate();
            }
