@@ -45,10 +45,11 @@ public class CameraService extends MicroService {
     @Override
     protected void initialize() {
         System.out.println(getName() + " for camera " + camera.getId() + " started");
+        camera.setStatus(STATUS.UP);
 
-        //Subscribe to TerminateBroadcast  //dafna push
+        //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
-           if (termBrocast.getSender().equals("TimeService")) {
+           if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("FusionSlamService")) {
                camera.setStatus(STATUS.DOWN);
                terminate();
            }
