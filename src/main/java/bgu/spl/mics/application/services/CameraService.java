@@ -64,7 +64,6 @@ public class CameraService extends MicroService {
                 sendBroadcast(new TerminatedBroadcast(getName()));
             }
             else { //there is data to read and status = up
-                camera.setLifeCycle(camera.getLifeCycle()-1);
                 StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick-camera.getFrequency());
                 //iterate all the objects and see if there is an object of id:ERROR
                 List<DetectedObject> objects = objectsAtTimeT.getDetectedObjects();
@@ -79,6 +78,8 @@ public class CameraService extends MicroService {
                 //there is no error
                 // Send DetectObjectsEvent
                 Future<Boolean> future = sendEvent(new DetectObjectsEvent(objectsAtTimeT));
+                //decrease camera life cycle
+                camera.setLifeCycle(camera.getLifeCycle()-1);
                 System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());
                 //update the statistical folder
                 statisticalFolder.incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
