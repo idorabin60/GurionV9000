@@ -36,11 +36,11 @@ public class FusionSlam {
             this.poses = poses;
         }
 
-        @Override
-        public String toString() {
-            return "FusionSLAM{" +
-                    "landmarks=" + Arrays.toString(landmarks) +
-                    ", poses=" + poses +
-                    '}';
-        }
+//        @Override
+//        public String toString() {
+//            return "FusionSLAM{" +
+//                    "landmarks=" + Arrays.toString(landmarks) +
+//                    ", poses=" + poses +
+//                    '}';
+//        }
     }

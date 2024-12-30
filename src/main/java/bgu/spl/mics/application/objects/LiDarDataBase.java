@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +31,12 @@ public class LiDarDataBase {
                 instance = new LiDarDataBase(configFilePath);
             }
         }
+    }
+    public static LiDarDataBase getInstance() {
+        if (SingletonHolder.instance == null) {
+            throw new IllegalStateException("LiDarDataBase not initialized. Call initialize() first.");
+        }
+        return SingletonHolder.instance;
     }
 
     // Public method to get the singleton instance
@@ -77,4 +84,13 @@ public class LiDarDataBase {
                 "cloudPoints=" + cloudPoints +
                 '}';
     }
+    public boolean hasData(String objectId, int time) {
+        for (StampedCloudPoints entry : cloudPoints) {
+            if (entry.getId().equals(objectId) && entry.getTime() == time) {
+                return true;
+            }
+        }
+        return false; // Return false if no matching entry is found
+    }
+
 }

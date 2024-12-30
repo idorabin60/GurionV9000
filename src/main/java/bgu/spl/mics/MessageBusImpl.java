@@ -35,7 +35,7 @@ public class MessageBusImpl implements MessageBus {
     //NEED TO CHANGE IT LIKE IN PS8
     public static MessageBusImpl getInstance() {
         if (instance == null) { // First check (no locking)
-            synchronized (MessageBusImpl.class) {
+            synchronized (MessageBusImpl.class) { //s
                 if (instance == null) { // Second check (with locking)
                     instance = new MessageBusImpl();
                 }
