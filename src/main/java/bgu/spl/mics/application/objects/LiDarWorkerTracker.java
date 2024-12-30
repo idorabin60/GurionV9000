@@ -15,12 +15,10 @@ public class LiDarWorkerTracker {
     private List<TrackedObject> lastTrackedObjects;
 
     public LiDarWorkerTracker(int id, int frequency) {
-        //CHECK THIS IMNOT SURE AT ALLLLL
         this.id = id;
         this.frequency = frequency;
         this.lastTrackedObjects = new ArrayList<>();
         this.status = STATUS.UP;
-
     }
 
     public int getId() {
@@ -50,13 +48,12 @@ public class LiDarWorkerTracker {
     public void removeTrackedObject(TrackedObject trackedObject) {
         this.lastTrackedObjects.remove(trackedObject);
     }
-    public  void  setStatus(STATUS status) {
+
+    public void setStatus(STATUS status) {
         this.status = status;
     }
-    public void  setFrequency(int frequency) {
+
+    public void setFrequency(int frequency) {
         this.frequency = frequency;
     }
-
-
-    // TODO: Define fields and methods.
 }
