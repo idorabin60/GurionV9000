@@ -20,7 +20,7 @@ public class Camera {
         this.frequency = frequency;
         this.status = status;
         this.detectedObjectsList = new ArrayList<>();
-        this.lifeCycle=0;
+        this.lifeCycle = 0;
     }
 
     // Getter for id
@@ -38,9 +38,14 @@ public class Camera {
         return status;
     }
 
-    public int getLifeCycle(){
+    public int getLifeCycle() {
         return lifeCycle;
     }
+
+    public void setLifeCycle(int lifeCycle) {
+        this.lifeCycle = lifeCycle;
+    }
+
     // Setter for status
     public void setStatus(STATUS status) {
         this.status = status;
@@ -52,7 +57,7 @@ public class Camera {
     }
 
     public StampedDetectedObjects getDetectedObjectAtTimeT(int timeT) {
-        if (timeT<0){
+        if (timeT < 0) {
             return null;
         }
         for (StampedDetectedObjects detectedObject : detectedObjectsList) {
@@ -62,16 +67,16 @@ public class Camera {
         }
         return null;
     }
-        // Setter for detectedObjectsList
+    // Setter for detectedObjectsList
 
 
-        // Method to add a single detected object
+    // Method to add a single detected object
 
-        public void updateDetectedObjects(List<StampedDetectedObjects> newDetectedObjects) {
-            if (newDetectedObjects == null) {
-                throw new IllegalArgumentException("Detected objects list cannot be null");
-            }
-            this.detectedObjectsList = newDetectedObjects;
-            this.lifeCycle=newDetectedObjects.size();
+    public void updateDetectedObjects(List<StampedDetectedObjects> newDetectedObjects) {
+        if (newDetectedObjects == null) {
+            throw new IllegalArgumentException("Detected objects list cannot be null");
         }
+        this.detectedObjectsList = newDetectedObjects;
+        this.lifeCycle = newDetectedObjects.size();
     }
+}
