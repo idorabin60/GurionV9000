@@ -77,7 +77,7 @@ public class CameraService extends MicroService {
                 }
                 //there is no error
                 // Send DetectObjectsEvent
-                Future<Boolean> future = sendEvent(new DetectObjectsEvent(objectsAtTimeT));
+                sendEvent(new DetectObjectsEvent(objectsAtTimeT));
                 //decrease camera life cycle
                 camera.setLifeCycle(camera.getLifeCycle()-1);
                 System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());

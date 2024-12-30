@@ -40,4 +40,7 @@ public class GPSIMU {
     public void setPoseList(ArrayList<Pose> poseList) {
         this.PoseList = poseList;
     }
+    public Pose getPose(int pose) {
+        return PoseList.get(pose);
+    }
 }
