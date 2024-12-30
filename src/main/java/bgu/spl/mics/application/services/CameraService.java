@@ -63,47 +63,35 @@ public class CameraService extends MicroService {
                 terminate();
                 sendBroadcast(new TerminatedBroadcast(getName()));
             }
-            if (camera.getStatus() == STATUS.UP) {
-                //there is data to read
-                    StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick-camera.getFrequency());
-                    if (objectsAtTimeT!=null) {
-                         //iterate all the objects and see if there is an object of id:ERROR
-                        List<DetectedObject> objects = objectsAtTimeT.getDetectedObjects();
-                        for (DetectedObject obj : objects) {
-                            if (obj.getId().equals("ERROR")){
-                                camera.setStatus(STATUS.ERROR);
-                                //update the errorOutput
-
-                                //send crashed Broadcast
-
-                            }
-                        }
-
-                        // Send DetectObjectsEvent
-                        Future<Boolean> future = sendEvent(new DetectObjectsEvent(objectsAtTimeT));
-                        System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());
-                        //update the statistical folder
-                        statisticalFolder.incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
-                    }
+            else if(camera.getStatus() == STATUS.ERROR) {
             }
-
-
-
-
-
-
-
+            else { //there is data to read and status = up
+                StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick-camera.getFrequency());
+                //iterate all the objects and see if there is an object of id:ERROR
+                List<DetectedObject> objects = objectsAtTimeT.getDetectedObjects();
+                for (DetectedObject obj : objects) {
+                    if (obj.getId().equals("ERROR")){
+                        camera.setStatus(STATUS.ERROR);
+                        //send crashed Broadcast
+                        sendBroadcast(new CrashedBroadcast(obj.getId(),obj.getDescription()));
+                        break;
+                    }
+                }
+                //there is no error
+                // Send DetectObjectsEvent
+                Future<Boolean> future = sendEvent(new DetectObjectsEvent(objectsAtTimeT));
+                System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());
+                //update the statistical folder
+                statisticalFolder.incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
             }
         });
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
-            //need to terminated
-
+            camera.setStatus(STATUS.DOWN);
+            terminate();
         });
-
     }
-
 
     }
 
