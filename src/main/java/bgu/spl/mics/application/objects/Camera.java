@@ -79,4 +79,15 @@ public class Camera {
         this.detectedObjectsList = newDetectedObjects;
         this.lifeCycle = newDetectedObjects.size();
     }
+    @Override
+    public String toString() {
+        return "Camera{" +
+                "id=" + id +
+                ", frequency=" + frequency +
+                ", status=" + status +
+                ", detectedObjectsList=" + detectedObjectsList +
+                ", lifeCycle=" + lifeCycle +
+                '}';
+    }
+
 }
