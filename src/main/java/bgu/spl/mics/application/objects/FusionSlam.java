@@ -11,12 +11,21 @@ import java.util.ArrayList;
 public class FusionSlam {
         // Fields
         private ArrayList<LandMark> landmarks; // Represents the map of the environment
-        private List<Pose> poses;     // Represents previous poses needed for calculations
+        private ArrayList<Pose> poses;     // Represents previous poses needed for calculations
+
 
         // Constructor
-        public FusionSlam(ArrayList<LandMark> landmarks, List<Pose> poses) {
-            this.landmarks = landmarks;
-            this.poses = poses;
+        public FusionSlam(){
+            landmarks = new ArrayList<LandMark>();
+            poses = new ArrayList<Pose>();
+        }
+
+        //Singleton
+        private static class FusionSlamHolder{
+            private static FusionSlam instance = new FusionSlam();
+        }
+        public static FusionSlam getInstance(){
+            return FusionSlamHolder.instance;
         }
 
         // Getters and Setters
@@ -32,7 +41,7 @@ public class FusionSlam {
             return poses;
         }
 
-        public void setPoses(List<Pose> poses) {
+        public void setPoses(ArrayList<Pose> poses) {
             this.poses = poses;
         }
 

@@ -1,9 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.messages.DetectObjectsEvent;
-import bgu.spl.mics.application.messages.TrackedObjectsEvent;
-import bgu.spl.mics.application.messages.TickBroadcast;
+import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.*;
 
 import java.util.ArrayList;
@@ -22,6 +20,7 @@ public class LiDarWorkerService extends MicroService {
 
     @Override
     protected void initialize() {
+        lidarTracker.setStatus(STATUS.UP);
         // Subscribe to DetectObjectsEvent
         subscribeEvent(DetectObjectsEvent.class, event -> {
             LiDarDataBase db = LiDarDataBase.getInstance(); // Access the LiDAR database
@@ -88,5 +87,21 @@ public class LiDarWorkerService extends MicroService {
                 return false; // Keep event in the list if not ready
             });
         });
+
+        // Subscribe to crashedBroadcast
+        subscribeBroadcast(CrashedBroadcast.class, terminate -> {
+            lidarTracker.setStatus(STATUS.DOWN);
+            terminate();
+        });
+
+        //Subscribe to TerminateBroadcast
+        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
+            if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("FusionSlamService")) {
+                lidarTracker.setStatus(STATUS.DOWN);
+                terminate();
+            }
+        });
+
+
     }
 } //pushing to main
