@@ -11,13 +11,13 @@ import java.util.List;
 
 public class LiDarWorkerService extends MicroService {
     private final LiDarWorkerTracker lidarTracker;
-    private final List<TrackedObjectsEvent> detectedObjectsEvents; // Stores created events
+    private final List<TrackedObjectsEvent> trackedObjectsEventList; // Stores created events
     private int currentTick; // Tracks the current time in ticks
 
     public LiDarWorkerService(LiDarWorkerTracker lidarTracker) {
         super("LiDarWorker" + lidarTracker.getId());
         this.lidarTracker = lidarTracker;
-        this.detectedObjectsEvents = new ArrayList<>();
+        this.trackedObjectsEventList = new ArrayList<>();
     }
 
     @Override
@@ -46,17 +46,16 @@ public class LiDarWorkerService extends MicroService {
                 if (matchingCloudPoints != null) {
                     List<List<Double>> points = matchingCloudPoints.getCloudPoints();
 
-                    // Convert cloud points to CloudPoint[]
-                    CloudPoint[] coordinates = points.stream()
-                            .map(point -> new CloudPoint(point.get(0), point.get(1)))
-                            .toArray(CloudPoint[]::new);
+                    // Convert cloud points to ArrayList<CloudPoint>
+                    ArrayList<CloudPoint> coordinates = new ArrayList<>();
+                    points.forEach(point -> coordinates.add(new CloudPoint(point.get(0), point.get(1))));
 
                     // Create a TrackedObject
                     TrackedObject trackedObject = new TrackedObject(
                             objectId,
                             eventTime,
                             detectedObject.getDescription(),
-                            coordinates
+                            coordinates // Pass as ArrayList<CloudPoint>
                     );
                     trackedObjects.add(trackedObject); // Add to the list
                 }
@@ -64,7 +63,7 @@ public class LiDarWorkerService extends MicroService {
 
             // Create a TrackedObjectsEvent for these tracked objects and store it
             if (!trackedObjects.isEmpty()) {
-                detectedObjectsEvents.add(new TrackedObjectsEvent(trackedObjects));
+                trackedObjectsEventList.add(new TrackedObjectsEvent(trackedObjects));
                 System.out.println(getName() + " created TrackedObjectsEvent with " + trackedObjects.size() + " objects.");
             } else {
                 System.out.println(getName() + " found no matching cloud points for event at time " + event.getTime());
@@ -76,7 +75,7 @@ public class LiDarWorkerService extends MicroService {
             currentTick = tick.getCurrentTick();
 
             // Filter and send events that meet the condition
-            detectedObjectsEvents.removeIf(event -> {
+            trackedObjectsEventList.removeIf(event -> {
                 // Retrieve the first TrackedObject's detection time for evaluation
                 int detectionTime = event.getTrackedObjects().get(0).getTime();
 

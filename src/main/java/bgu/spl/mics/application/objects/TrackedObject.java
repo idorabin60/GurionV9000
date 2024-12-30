@@ -1,7 +1,5 @@
 package bgu.spl.mics.application.objects;
 import java.util.ArrayList;
-import java.util.Arrays;
-import  java.util.ArrayList;
 
 /**
  * Represents an object tracked by the LiDAR.
@@ -13,10 +11,10 @@ public class TrackedObject {
     private String id;
     private int time;
     private String description;
-    private ArrayList<cloudPoints> coordinates;
+    private ArrayList<CloudPoint> coordinates;
 
     // Constructor
-    public TrackedObject(String id, int time, String description,ArrayList<cloudPoints> coordinates) {
+    public TrackedObject(String id, int time, String description, ArrayList<CloudPoint> coordinates) {
         this.id = id;
         this.time = time;
         this.description = description;
@@ -48,11 +46,11 @@ public class TrackedObject {
         this.description = description;
     }
 
-    public ArrayList<cloudPoints>  getCoordinates() {
+    public ArrayList<CloudPoint>  getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(ArrayList<cloudPoints>  coordinates) {
+    public void setCoordinates(ArrayList<CloudPoint>  coordinates) {
         this.coordinates = coordinates;
     }
 
@@ -62,7 +60,8 @@ public class TrackedObject {
                 "id='" + id + '\'' +
                 ", time=" + time +
                 ", description='" + description + '\'' +
-                ", coordinates=" + ArraysList.toString(coordinates) +
+                ", coordinates=" + coordinates +
                 '}';
     }
+
 }

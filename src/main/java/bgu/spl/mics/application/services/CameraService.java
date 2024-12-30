@@ -74,8 +74,6 @@ public class CameraService extends MicroService {
                                 camera.setStatus(STATUS.ERROR);
                                 //update the errorOutput
 
-                                //send crashed Broadcast
-
                             }
                         }
 
