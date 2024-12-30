@@ -1,17 +1,16 @@
 package bgu.spl.mics.application.messages;
-
 import bgu.spl.mics.Broadcast;
 
 public class TerminatedBroadcast implements Broadcast {
 
-    private String message;
+    private final String sender;
 
-    public TerminatedBroadcast() {
-        this.message = "Shtting down";
-    }
-    public void printMessage() {
-        System.out.println(this.message);
+    public TerminatedBroadcast(String sender) {
+        this.sender = sender;
     }
 
+    public String getSender() {
+        return sender;
+    }
 
 }
