@@ -7,7 +7,6 @@ import com.google.gson.reflect.TypeToken;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,20 +17,21 @@ public class LiDarDataBase {
     private List<StampedCloudPoints> cloudPoints;
 
     // Private constructor to prevent instantiation
-    private LiDarDataBase(String configFilePath) {
-        parseConfigAndLoadData(configFilePath);
+    private LiDarDataBase(String lidarDataPath) {
+        loadLidarData(lidarDataPath);
     }
 
     // Static holder for the singleton instance
     private static class SingletonHolder {
         private static LiDarDataBase instance;
 
-        private static void initialize(String configFilePath) {
+        private static void initialize(String lidarDataPath) {
             if (instance == null) {
-                instance = new LiDarDataBase(configFilePath);
+                instance = new LiDarDataBase(lidarDataPath);
             }
         }
     }
+
     public static LiDarDataBase getInstance() {
         if (SingletonHolder.instance == null) {
             throw new IllegalStateException("LiDarDataBase not initialized. Call initialize() first.");
@@ -39,41 +39,28 @@ public class LiDarDataBase {
         return SingletonHolder.instance;
     }
 
-    // Public method to get the singleton instance
-    public static LiDarDataBase getInstance(String configFilePath) {
-        SingletonHolder.initialize(configFilePath);
+    public static LiDarDataBase getInstance(String lidarDataPath) {
+        SingletonHolder.initialize(lidarDataPath);
         return SingletonHolder.instance;
     }
 
-    // Parses the main config file and loads the LiDAR data
-    private void parseConfigAndLoadData(String configFilePath) {
-        try (FileReader configReader = new FileReader(configFilePath)) {
-            Gson gson = new Gson();
-
-            // Parse the main config file
-            JsonObject config = gson.fromJson(configReader, JsonObject.class);
-            String lidarDataPath = config.getAsJsonObject("LidarWorkers").get("lidars_data_path").getAsString();
-
-            // Load the LiDAR data from the specified path
-            loadLidarData(lidarDataPath);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load configuration file: " + configFilePath, e);
-        }
-    }
-
-    // Loads the LiDAR data from the specified file
     private void loadLidarData(String lidarDataPath) {
         try (FileReader lidarReader = new FileReader(lidarDataPath)) {
             Gson gson = new Gson();
             Type listType = new TypeToken<List<StampedCloudPoints>>() {}.getType();
 
+            // Parse the JSON array into a list of StampedCloudPoints
             cloudPoints = gson.fromJson(lidarReader, listType);
+
+            // Validate the loaded data
+            if (cloudPoints == null || cloudPoints.isEmpty()) {
+                throw new RuntimeException("LiDAR data is empty or invalid");
+            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to load LiDAR data from file: " + lidarDataPath, e);
         }
     }
 
-    // Getter for cloudPoints
     public List<StampedCloudPoints> getCloudPoints() {
         return cloudPoints;
     }
@@ -84,13 +71,9 @@ public class LiDarDataBase {
                 "cloudPoints=" + cloudPoints +
                 '}';
     }
-    public boolean hasData(String objectId, int time) {
-        for (StampedCloudPoints entry : cloudPoints) {
-            if (entry.getId().equals(objectId) && entry.getTime() == time) {
-                return true;
-            }
-        }
-        return false; // Return false if no matching entry is found
-    }
 
+    public boolean hasData(String objectId, int time) {
+        return cloudPoints.stream()
+                .anyMatch(entry -> entry.getId().equals(objectId) && entry.getTime() == time);
+    }
 }
