@@ -49,6 +49,7 @@ public class PoseService extends MicroService {
         subscribeBroadcast(TerminatedBroadcast.class, terminated -> {
             //implement it
         });
+
         // TODO Implement this
     }
 }
