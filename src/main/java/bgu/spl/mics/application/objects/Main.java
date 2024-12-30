@@ -1,24 +1,35 @@
 package bgu.spl.mics.application.objects;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        // Path to the configuration file
-        String configFilePath = "configuration_file.json";
+        String configFilePath = "configuration_file.json"; // Replace with the actual path
 
-        // Initialize cameras from the configuration file
-        List<Camera> cameras = CameraDataUpdater.initializeCamerasFromConfig(configFilePath);
+        try {
+            // Initialize the GPSIMUDataBase
+            GPSIMUDataBase gpsimuDb = GPSIMUDataBase.getInstance();
+            gpsimuDb.initialize(configFilePath);
 
-        // Update cameras with stamped detected objects from the camera data JSON file
-        CameraDataUpdater.updateCamerasFromJson(cameras, configFilePath);
+            // Access the GPSIMU instance
+            GPSIMU gpsimu = gpsimuDb.getGPSIMU();
 
-        // Print updated cameras
-        for (Camera camera : cameras) {
-            System.out.println("hi ido");
-            System.out.println(camera.getDetectedObjectAtTimeT()DetectedObjectAtTimeT(2));
-            System.out.println("Camera ID: " + camera.getId());
-            System.out.println("Detected Objects: " + camera.getDetectedObjectsList());
+            // Print all poses
+            System.out.println("Loaded Poses:");
+            gpsimu.getPoseList().forEach(System.out::println);
+
+            // Check GPSIMU status
+            System.out.println("GPSIMU Status: " + gpsimu.getStatus());
+        } catch (RuntimeException e) {
+            System.err.println("Error initializing GPSIMUDataBase: " + e.getMessage());
         }
     }
 }
