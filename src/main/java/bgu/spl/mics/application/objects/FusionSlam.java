@@ -22,34 +22,77 @@ public class FusionSlam {
 
         //Singleton
         private static class FusionSlamHolder{
-            private static FusionSlam instance = new FusionSlam();
+            private static final FusionSlam instance = new FusionSlam();
         }
         public static FusionSlam getInstance(){
             return FusionSlamHolder.instance;
         }
 
         // Getters and Setters
-        public ArrayList<LandMark> getLandmarks() {
-            return landmarks;
+        public void addPose(Pose pose) {
+            poses.add(pose);
         }
-
-        public void setLandmarks(ArrayList<LandMark> landmarks) {
-            this.landmarks = landmarks;
+        public Pose getPose(int time){
+            try {
+                return poses.get(time - 1);
+            } catch (IndexOutOfBoundsException e) {
+                return null;
+            }
         }
+    //Return if there is LankMark like this and null otherwise
+    public LandMark getLankMark (String id){
+            for (LandMark l : landmarks){
+                if (l.getId().equals(id))
+                    return l;
+            }
+            return null;
+    }
+    public void addLankMark(LandMark l){
+            landmarks.add(l);
+    }
 
-        public List<Pose> getPoses() {
-            return poses;
+
+    //Calculation methods
+
+    private double calcGlobalX(CloudPoint c, Pose pose) {
+        double x = c.getX();
+        double y = c.getY();
+        double rad = Math.toRadians(pose.getYaw());
+        return Math.cos(rad) * x - Math.sin(rad) * y + pose.getX();
+    }
+
+    private double calcGlobalY(CloudPoint c, Pose pose) {
+        double x = c.getX();
+        double y = c.getY();
+        double rad = Math.toRadians(pose.getYaw());
+        return Math.sin(rad) * x + Math.cos(rad) * y + pose.getY();
+    }
+
+    private void trackedObjectToGlobal(TrackedObject t, Pose pose) {
+        t.getCoordinates().forEach(c -> {
+            CloudPoint temp = new CloudPoint(c.getX(), c.getY());
+            c.setX(calcGlobalX(temp, pose));
+            c.setY(calcGlobalY(temp, pose));
+        });
+    }
+
+    //Functional methods
+
+    //There is landMark like this - only update the coordinates.
+    public void updateLandmarkCoordinates(LandMark l, TrackedObject t) {
+        List<CloudPoint> landmarkCoords = l.getCoordinates();
+        List<CloudPoint> trackedCoords = t.getCoordinates();
+
+        for (int i = 0; i < trackedCoords.size(); i++) {
+            CloudPoint trackedPoint = trackedCoords.get(i);
+            if (i < landmarkCoords.size()) {
+                CloudPoint landmarkPoint = landmarkCoords.get(i);
+                landmarkPoint.setX((landmarkPoint.getX() + trackedPoint.getX()) / 2);
+                landmarkPoint.setY((landmarkPoint.getY() + trackedPoint.getY()) / 2);
+            } else {
+                landmarkCoords.add(trackedPoint);
+            }
         }
+    }
 
-        public void setPoses(ArrayList<Pose> poses) {
-            this.poses = poses;
-        }
-
-//        @Override
-//        public String toString() {
-//            return "FusionSLAM{" +
-//                    "landmarks=" + Arrays.toString(landmarks) +
-//                    ", poses=" + poses +
-//                    '}';
-//        }
     }
