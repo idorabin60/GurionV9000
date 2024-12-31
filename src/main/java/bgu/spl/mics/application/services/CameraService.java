@@ -72,6 +72,9 @@ public class CameraService extends MicroService {
                     if (obj.getId().equals("ERROR")){
                         camera.setStatus(STATUS.ERROR);
                         //send crashed Broadcast
+                        errorOutput.setError(obj.getDescription());
+                        errorOutput.setFaultySensor(this.getName());
+                        errorOutput.setCameraLastFrameName(this.getName());
                         sendBroadcast(new CrashedBroadcast(obj.getId(),obj.getDescription()));
                         break;
                     }
