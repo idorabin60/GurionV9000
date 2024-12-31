@@ -1,4 +1,5 @@
 package bgu.spl.mics;
+import bgu.spl.mics.application.objects.ErrorOutput;
 import bgu.spl.mics.application.objects.StatisticalFolder;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +29,7 @@ public abstract class MicroService implements Runnable {
     private ConcurrentHashMap<Class<?>, Callback<?>> callbacks; // Maps message types to their callbacks
     private MessageBus messageBus; // Reference to the MessageBus singleton
     protected StatisticalFolder statisticalFolder;
+    protected ErrorOutput errorOutput;
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
@@ -37,6 +39,7 @@ public abstract class MicroService implements Runnable {
         this.callbacks = new ConcurrentHashMap<>(); // Initialize the callbacks map
         this.messageBus = MessageBusImpl.getInstance(); // Assuming MessageBusImpl is a singleton
         this.statisticalFolder = StatisticalFolder.getInstance();
+        this.errorOutput= ErrorOutput.getInstance();
     }
 
 

@@ -17,8 +17,17 @@ public class ErrorOutput {
         this.cameraLastFrameName = "";
         this.lastCamerasFrame = new StampedDetectedObjects();
         this.lidarLastFrameName = "";
-//        this.lastLiDarWorkerTrackersFrame = new;
-//        this.poses = poses;
+       this.lastLiDarWorkerTrackersFrame = new StampedCloudPoints();
+       this.poses = null;
+    }
+
+    // Singleton pattern
+    private static class SingletonHolder {
+        private static final ErrorOutput instance = new ErrorOutput();
+    }
+
+    public static ErrorOutput getInstance() {
+        return ErrorOutput.SingletonHolder.instance;
     }
 
 

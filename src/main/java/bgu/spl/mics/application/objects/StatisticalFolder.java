@@ -37,8 +37,8 @@ public class StatisticalFolder {
      * Updates the system runtime.
      * @param ticks The number of ticks to add to the system runtime.
      */
-    public void incrementSystemRuntime(int ticks) {
-        systemRuntime.addAndGet(ticks);
+    public void setSystemRuntime(int ticks) {
+        systemRuntime.set(ticks);
     }
 
     /**
