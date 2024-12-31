@@ -8,7 +8,7 @@ import bgu.spl.mics.application.objects.TrackedObject;
 
 import java.util.List;
 
-public class DetectObjectsEvent implements Event<Boolean> {
+public class DetectObjectsEvent implements Event<List<TrackedObject>> {
 
     private final StampedDetectedObjects stampedDetectedObjectInCertinTimeByCertinCamera;
 

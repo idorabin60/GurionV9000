@@ -15,7 +15,7 @@ public class ErrorOutput {
         this.error = "";
         this.faultySensor = "";
         this.cameraLastFrameName = "";
-        this.lastCamerasFrame = new StampedDetectedObjects();
+        this.lastCamerasFrame = null;
         this.lidarLastFrameName = "";
        this.lastLiDarWorkerTrackersFrame = new StampedCloudPoints();
        this.poses = null;

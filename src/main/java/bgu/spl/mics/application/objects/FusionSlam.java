@@ -68,7 +68,7 @@ public class FusionSlam {
         return Math.sin(rad) * x + Math.cos(rad) * y + pose.getY();
     }
 
-    private void trackedObjectToGlobal(TrackedObject t, Pose pose) {
+    public void trackedObjectToGlobal(TrackedObject t, Pose pose) {
         t.getCoordinates().forEach(c -> {
             CloudPoint temp = new CloudPoint(c.getX(), c.getY());
             c.setX(calcGlobalX(temp, pose));
