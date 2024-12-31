@@ -25,7 +25,7 @@ public class FusionSlamService extends MicroService {
 
     public FusionSlamService(FusionSlam fusionSlam) {
         super("FusionSlam");
-        this.fusionSlam=fusionSlam;
+        this.fusionSlam=fusionSlam.getInstance();
         this.numsOfLiDars =  new AtomicInteger(0);
         this.numsOfCameras= new AtomicInteger(0);
     }
@@ -42,6 +42,8 @@ public class FusionSlamService extends MicroService {
         subscribeEvent(TrackedObjectsEvent.class, (TrackedObjectsEvent event) -> {
             List<TrackedObject> trackedObjects = event.getTrackedObjects();
             for (TrackedObject object : trackedObjects){
+                //convert coordinates to global
+                fusionSlam.trackedObjectToGlobal(object,fusionSlam.getPose(object.getTime()));
                 LandMark landMarkIsExists = fusionSlam.getLankMark(object.getId());
                 if (landMarkIsExists==null){ //A new lankMark
                     fusionSlam.addLankMark(new LandMark(object.getId(), object.getDescription(), object.getCoordinates()));
@@ -57,14 +59,14 @@ public class FusionSlamService extends MicroService {
         //Handle PoseEvent
         subscribeEvent(PoseEvent.class, (PoseEvent event) -> {
             fusionSlam.addPose(event.getPose());
-            complete(event, true);
+            complete(event, event.getPose());
         });
 
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
-            if (numsOfCameras.get()>0 && numsOfLiDars.get()>0 ){
+            if (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 ){
                 sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
             }
-            else {  //NEED TO ASK IDO IF TICK = 1
+            else {
                 statisticalFolder.setSystemRuntime(tick.getCurrentTick());
             }
         });
@@ -72,7 +74,7 @@ public class FusionSlamService extends MicroService {
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
             //NEED TO ASK IDO
-            if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("FusionSlamService") ) {
+            if (termBrocast.getSender().equals("TimeService")) {
                 ///NEED TO COMPLETE
                 terminate();
             }

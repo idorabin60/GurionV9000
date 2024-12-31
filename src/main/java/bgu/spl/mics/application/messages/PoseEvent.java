@@ -6,7 +6,7 @@ import bgu.spl.mics.application.objects.Pose;
 /**
  * PoseEvent provides the robot's current pose for a given tick.
  */
-public class PoseEvent implements Event<Boolean> {
+public class PoseEvent implements Event<Pose> {
     private final Pose pose;
 
     public PoseEvent(Pose pose) {

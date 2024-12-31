@@ -1,6 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
@@ -41,6 +42,7 @@ public class TimeService extends MicroService {
         subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
             if (currentTick > duration) {
                 sendBroadcast(new TerminatedBroadcast("TimeService"));
+                terminate();
             } else {
                 try {
                     Thread.sleep(tickInterval * 1000);
@@ -58,7 +60,7 @@ public class TimeService extends MicroService {
                 sendBroadcast(new TerminatedBroadcast("TimeService"));
             }
         });
-        subscribeBroadcast(TerminatedBroadcast.class, terminatedBroadcast -> {
+        subscribeBroadcast(CrashedBroadcast.class, terminatedBroadcast -> {
             terminate();
         });
     }
