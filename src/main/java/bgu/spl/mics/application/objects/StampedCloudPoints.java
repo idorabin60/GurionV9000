@@ -1,4 +1,5 @@
 package bgu.spl.mics.application.objects;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,10 +14,10 @@ public class StampedCloudPoints {
     private List<List<Double>> cloudPoints;
 
     // Constructor
-    public StampedCloudPoints(String id, int time, List<List<Double>> cloudPoints) {
-        this.id = id;
-        this.time = time;
-        this.cloudPoints = cloudPoints;
+    public StampedCloudPoints() {
+        this.id = "";
+        this.time = 0;
+        this.cloudPoints = new ArrayList<List<Double>>();
     }
 
     // Getters and Setters

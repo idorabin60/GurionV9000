@@ -65,7 +65,7 @@ public class FusionSlamService extends MicroService {
                 sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
             }
             else {  //NEED TO ASK IDO IF TICK = 1
-                statisticalFolder.incrementSystemRuntime(1);
+                statisticalFolder.setSystemRuntime(tick.getCurrentTick());
             }
         });
 
