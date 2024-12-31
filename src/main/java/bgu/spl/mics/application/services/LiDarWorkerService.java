@@ -17,6 +17,7 @@ public class LiDarWorkerService extends MicroService {
         this.lidarTracker = lidarTracker;
         this.trackedObjectsEventList = new ArrayList<>();
     }
+    //WE NEED TO ADD COMPLETE()
 
     @Override
     protected void initialize() {
