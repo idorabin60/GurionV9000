@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.objects;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,6 +11,11 @@ public class StampedDetectedObjects {
     private int time; // The tick timestamp
     private List<DetectedObject> detectedObjects; // List of detected objects
 
+    public StampedDetectedObjects() {
+        this.time = 0;
+        this.detectedObjects = new ArrayList<DetectedObject>() {
+        };
+    }
     public StampedDetectedObjects(int time, List<DetectedObject> detectedObjects) {
         this.time = time;
         this.detectedObjects = detectedObjects;
