@@ -1,13 +1,12 @@
 package bgu.spl.mics;
-
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Collections;
+
+//TODO: add synchronization!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 /**
  * The {@link MessageBusImpl class is the implementation of the MessageBus interface.
@@ -16,179 +15,129 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * All other methods and members you add the class must be private.
  */
 public class MessageBusImpl implements MessageBus {
-    private final ConcurrentHashMap<MicroService, BlockingQueue<Message>> microServiceMessageQueue;
-    private final ConcurrentHashMap<Class<? extends Broadcast>, CopyOnWriteArrayList<MicroService>> broadcastSubscriptions; //mabye it should
-    private final ConcurrentHashMap<Class<? extends Event>, BlockingQueue<MicroService>> eventSubscriptions;
-    private final ConcurrentHashMap<Event<?>, Future<?>> eventFutureMap;
-    private static MessageBusImpl instance;
-
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
-
-    private MessageBusImpl() {
-        microServiceMessageQueue = new ConcurrentHashMap<>();//       broadcastSubscriptions = new ConcurrentHashMap<>();
-        eventSubscriptions = new ConcurrentHashMap<>();
-        eventFutureMap = new ConcurrentHashMap<>();
-        broadcastSubscriptions = new ConcurrentHashMap<>();
+    private static class SingletonHolder {
+        private static final MessageBusImpl instance = new MessageBusImpl();
     }
 
-    //NEED TO CHANGE IT LIKE IN PS8
-    public static MessageBusImpl getInstance() {
-        if (instance == null) { // First check (no locking)
-            synchronized (MessageBusImpl.class) { //s
-                if (instance == null) { // Second check (with locking)
-                    instance = new MessageBusImpl();
-                }
-            }
-        }
-        return instance;
+    private static MessageBusImpl instance;
+    private ConcurrentHashMap<Event<?>, Future<?>> futures;
+    private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Message>> missions;
+    private ConcurrentHashMap<Class<? extends Message>, LinkedBlockingQueue<MicroService>> eventHandlers;
+    private ConcurrentHashMap<Class<? extends Message>, List<MicroService>> broadcastSubscriptions;
+
+    private MessageBusImpl(){
+        futures = new ConcurrentHashMap<>();
+        missions = new ConcurrentHashMap<MicroService, LinkedBlockingQueue<Message>>();
+        eventHandlers = new ConcurrentHashMap<>();
+        broadcastSubscriptions = new ConcurrentHashMap<Class<? extends Message>, List<MicroService>>();
     }
 
     @Override
     public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-        lock.readLock().lock();
         // TODO Auto-generated method stub
-        eventSubscriptions.computeIfAbsent(type, key -> new LinkedBlockingQueue<>());
-        try {
-            eventSubscriptions.get(type).put(m);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Subscription interrupted", e);
-        } finally {
-            lock.readLock().unlock();
+        eventHandlers.putIfAbsent(type, new LinkedBlockingQueue<>());
+        try{
+            eventHandlers.get(type).put(m);
         }
-
-
+        catch (InterruptedException i){
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Override
     public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
-        lock.readLock().lock();
-        try {
-            broadcastSubscriptions.computeIfAbsent(type, key -> new CopyOnWriteArrayList<>()).add(m);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            lock.readLock().unlock();
-        }
-        // Add the MicroService to the list of subscribers for the given broadcast type
+        // TODO Auto-generated method stub
+        broadcastSubscriptions.putIfAbsent(type, Collections.synchronizedList(new ArrayList<>()));
+        List<MicroService> receiverList = broadcastSubscriptions.get(type);
+        receiverList.add(m);
     }
-
 
     @Override
     public <T> void complete(Event<T> e, T result) {
-        Future<T> future = (Future<T>) eventFutureMap.get(e);
-        if (future != null) {
-            future.resolve(result); // Resolves the Future with the result.
-        }
+        // TODO Auto-generated method stub
+        Future<T> f = (Future<T>)futures.get(e);
+        if (f!=null)
+            f.resolve(result);
+//		futures.remove(e);
     }
-
 
     @Override
     public void sendBroadcast(Broadcast b) {
-        lock.readLock();
-        try {
-            CopyOnWriteArrayList<MicroService> brodacstBSubs = broadcastSubscriptions.get(b.getClass());
-            if (brodacstBSubs != null) {
-                for (MicroService m : brodacstBSubs) {
-                    BlockingQueue<Message> queue = microServiceMessageQueue.get(m);
-                    if (queue != null) {
-                        queue.add(b);
-                    }
-                }
+        // TODO Auto-generated method stub
+        List<MicroService> broadcastTo = broadcastSubscriptions.get(b);
+        if(broadcastTo==null)
+            return;
+        for (MicroService mic: broadcastTo){
+            try {
+                LinkedBlockingQueue<Message> bq = missions.get(mic);
+                bq.put(b);
             }
-
-        } finally {
-            lock.readLock().unlock();
+            catch (InterruptedException i){
+                Thread.currentThread().interrupt();
+            }
         }
-
-
     }
 
 
     @Override
     public <T> Future<T> sendEvent(Event<T> e) {
-        lock.readLock().lock();
-        BlockingQueue<MicroService> subscribers = eventSubscriptions.get(e.getClass());
-        if (subscribers == null || subscribers.isEmpty()) {
-            return null; // No MicroServices are subscribed to this event type.
+        // TODO Auto-generated method stub
+        LinkedBlockingQueue<MicroService> handlers = eventHandlers.get(e);
+        if (handlers.isEmpty() || handlers == null){
+            return null;
         }
-
+        //Round-Robin starts here
         try {
-            MicroService m = subscribers.poll(); // Get the next MicroService in the round-robin queue.
-            if (m != null) {
-                BlockingQueue<Message> queue = microServiceMessageQueue.get(m);
-                if (queue != null) {
-                    queue.add(e); // Add the event to the MicroService's message queue.
-                }
-                subscribers.put(m); // Re-add the MicroService to the queue for round-robin behavior.
-
-                // Create and store the Future object for this event.
-                Future<T> future = new Future<>();
-                eventFutureMap.put(e, future);
-                return future;
-            }
-        } catch (InterruptedException ex) {
+            MicroService handler = handlers.take();
+            LinkedBlockingQueue<Message> q = missions.get(handler);
+            q.put(e);
+            handlers.put(handler);
+        }catch (InterruptedException i){
             Thread.currentThread().interrupt();
-        } finally {
-            lock.readLock().unlock();
         }
-
-        return null; // Return null if no MicroService was available.
+        //Round-Robin ends here
+        Future<T> f = new Future<>();
+        futures.put(e,f);
+        return f;
     }
-
 
     @Override
     public void register(MicroService m) {
-        lock.readLock().lock();
-        try {
-            microServiceMessageQueue.putIfAbsent(m, new LinkedBlockingQueue<>());
-        } finally {
-            lock.readLock().unlock();
-        }
+        // TODO Auto-generated method stub
+        missions.put(m, new LinkedBlockingQueue<>());
     }
 
-    @Override  // check about the
+    @Override
     public void unregister(MicroService m) {
-        lock.writeLock().lock(); // Write lock to modify shared data structures
-        try {
-            // Remove from microServiceMessageQueue
-            microServiceMessageQueue.remove(m);
-
-            // Remove from eventSubscriptions
-            eventSubscriptions.forEach((eventType, microServiceQueue) -> {
-                microServiceQueue.remove(m);
-            });
-
-            // Remove from broadcastSubscriptions
-            broadcastSubscriptions.forEach((broadcastType, microServiceQueue) -> {
-                microServiceQueue.remove(m);
-            });
-
-            // Need to check if its redundant or not!
-            eventFutureMap.forEach((event, future) -> {
-                BlockingQueue<MicroService> subscribers = eventSubscriptions.get(event.getClass());
-                if (subscribers != null && subscribers.contains(m)) {
-                    future.resolve(null);
-                }
-            });
-        } finally {
-            lock.writeLock().unlock();
+        // TODO Auto-generated method stub
+        missions.remove(m);
+        for (LinkedBlockingQueue<MicroService> s : eventHandlers.values() ){
+            if(s.contains(m)){
+                s.remove(m);
+            }
         }
-    }
+        for (List<MicroService> s : broadcastSubscriptions.values() ){
+            if(s.contains(m)){
+                s.remove(m);
+            }
+        }
 
+
+    }
 
     @Override
     public Message awaitMessage(MicroService m) throws InterruptedException {
-        lock.readLock().lock();
-        try {
-            BlockingQueue<Message> queue = microServiceMessageQueue.get(m);
-            return queue.take(); // Waits for the next message
-        } finally {
-            lock.readLock().unlock();
+        if(!missions.get(m).isEmpty()) {
+            try {
+                return missions.get(m).take();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
+        return null;
     }
 
-
+    public static MessageBusImpl getInstance(){
+        return SingletonHolder.instance;
+    }
 }

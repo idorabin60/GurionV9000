@@ -1,5 +1,5 @@
 package bgu.spl.mics;
-import bgu.spl.mics.application.objects.StatisticalFolder;
+
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * message-queue (see {@link MessageBus#register(bgu.spl.mics.MicroService)}
  * method). The abstract MicroService stores this callback together with the
  * type of the message is related to.
- *
  * Only private fields and methods may be added to this class.
  * <p>
  */
@@ -25,20 +24,16 @@ public abstract class MicroService implements Runnable {
 
     private boolean terminated = false;
     private final String name;
-    private ConcurrentHashMap<Class<?>, Callback<?>> callbacks; // Maps message types to their callbacks
-    private MessageBus messageBus; // Reference to the MessageBus singleton
-    protected StatisticalFolder statisticalFolder;
+    private final ConcurrentHashMap<Class<? extends Message>, Callback<?>> map;
+
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
      */
     public MicroService(String name) {
         this.name = name;
-        this.callbacks = new ConcurrentHashMap<>(); // Initialize the callbacks map
-        this.messageBus = MessageBusImpl.getInstance(); // Assuming MessageBusImpl is a singleton
-        this.statisticalFolder = StatisticalFolder.getInstance();
+        map = new ConcurrentHashMap<>();
     }
-
 
     /**
      * Subscribes to events of type {@code type} with the callback
@@ -62,8 +57,9 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <T, E extends Event<T>> void subscribeEvent(Class<E> type, Callback<E> callback) {
-        callbacks.put(type, callback);
-        messageBus.subscribeEvent(type, this);
+        //TODO: implement this.
+        MessageBusImpl.getInstance().subscribeEvent(type, this);
+        map.put(type, callback);
     }
 
     /**
@@ -87,8 +83,8 @@ public abstract class MicroService implements Runnable {
      *                 queue.
      */
     protected final <B extends Broadcast> void subscribeBroadcast(Class<B> type, Callback<B> callback) {
-        callbacks.put(type, callback);
-        messageBus.subscribeBroadcast(type, this);
+        MessageBusImpl.getInstance().subscribeBroadcast(type, this);
+        map.put(type, callback);
     }
 
     /**
@@ -104,7 +100,7 @@ public abstract class MicroService implements Runnable {
      * 	       			null in case no micro-service has subscribed to {@code e.getClass()}.
      */
     protected final <T> Future<T> sendEvent(Event<T> e) {
-        return messageBus.sendEvent(e);
+        return MessageBusImpl.getInstance().sendEvent(e);
     }
 
     /**
@@ -114,7 +110,7 @@ public abstract class MicroService implements Runnable {
      * @param b The broadcast message to send
      */
     protected final void sendBroadcast(Broadcast b) {
-        messageBus.sendBroadcast(b);
+        MessageBusImpl.getInstance().sendBroadcast(b);
     }
 
     /**
@@ -128,7 +124,7 @@ public abstract class MicroService implements Runnable {
      *               {@code e}.
      */
     protected final <T> void complete(Event<T> e, T result) {
-        messageBus.complete(e, result);
+        MessageBusImpl.getInstance().complete(e, result);
     }
 
     /**
@@ -143,6 +139,7 @@ public abstract class MicroService implements Runnable {
     protected final void terminate() {
         this.terminated = true;
     }
+
     /**
      * @return the name of the service - the service name is given to it in the
      *         construction time and is used mainly for debugging purposes.
@@ -157,22 +154,17 @@ public abstract class MicroService implements Runnable {
      */
     @Override
     public final void run() {
-        try {
-            messageBus.register(this);
-            initialize();
-            while (!terminated) {
-                Message message = messageBus.awaitMessage(this); // Wait for a message
-                if (message != null) {
-                    Callback<Message> callback = (Callback<Message>) callbacks.get(message.getClass());
-                    if (callback != null) {
-                        callback.call(message); // Execute the callback
-                    }
+        initialize();
+        while (!terminated) {
+            try {
+                Message message = MessageBusImpl.getInstance().awaitMessage(this);
+                Callback callback = map.get(message.getClass()); //possible terminations will happen here
+                if (callback != null) {
+                    callback.call(message);
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-           Thread.currentThread().interrupt();
-        } finally {
-            messageBus.unregister(this); // Unregister from the MessageBus
         }
     }
 }

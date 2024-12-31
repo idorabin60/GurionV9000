@@ -11,7 +11,10 @@ import java.util.ArrayList;
 public class FusionSlam {
         // Fields
         private ArrayList<LandMark> landmarks; // Represents the map of the environment
-        private ArrayList<Pose> poses;     // Represents previous poses needed for calculations
+        private ArrayList<Pose> poses;// Represents previous poses needed for calculations
+        private int numbOfMicroServices;
+        private int numbOfCameraServices;
+        private int numberOfLidarServices;
 
 
         // Constructor
