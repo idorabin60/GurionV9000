@@ -8,6 +8,7 @@ import bgu.spl.mics.application.objects.TrackedObject;
 import bgu.spl.mics.application.messages.*;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * FusionSlamService integrates data from multiple sensors to build and update
@@ -18,10 +19,15 @@ import java.util.List;
  */
 public class FusionSlamService extends MicroService {
 
-    FusionSlam fusionSlam;
+    private FusionSlam fusionSlam;
+    private AtomicInteger numsOfCameras;
+    private AtomicInteger numsOfLiDars;
+
     public FusionSlamService(FusionSlam fusionSlam) {
         super("FusionSlam");
         this.fusionSlam=fusionSlam;
+        this.numsOfLiDars =  new AtomicInteger(0);
+        this.numsOfCameras= new AtomicInteger(0);
     }
 
     /**
@@ -55,17 +61,26 @@ public class FusionSlamService extends MicroService {
         });
 
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
-            //NEED TO ASK IDO IF TICK = 1
-            statisticalFolder.incrementSystemRuntime(1);
+            if (numsOfCameras.get()>0 && numsOfLiDars.get()>0 ){
+                sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
+            }
+            else {  //NEED TO ASK IDO IF TICK = 1
+                statisticalFolder.incrementSystemRuntime(1);
+            }
         });
 
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
             //NEED TO ASK IDO
-            if (termBrocast.getSender().equals("TimeService")) {
+            if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("FusionSlamService") ) {
                 ///NEED TO COMPLETE
                 terminate();
             }
+            else if (termBrocast.getSender().equals("Camera"))
+                numsOfCameras.addAndGet(-1);
+            else if (termBrocast.getSender().equals("LiDar"))
+                numsOfLiDars.addAndGet(-1);
+
         });
 
         // Subscribe to crashedBroadcast

@@ -9,20 +9,74 @@ public class ErrorOutput {
     private String lidarLastFrameName;
     private StampedCloudPoints lastLiDarWorkerTrackersFrame; //the last frame detected by Lidar
     private Pose[]poses;
-    private StatisticalFolder statistics;
 
     // Constructor to initialize all fields
-    public ErrorOutput(String error, String faultySensor, String cameraLastFrameName,
-                       StampedDetectedObjects lastCamerasFrame, String lidarLastFrameName,
-                       StampedCloudPoints lastLiDarWorkerTrackersFrame, Pose[] poses,
-                       StatisticalFolder statistics) {
-        this.error = error;
-        this.faultySensor = faultySensor;
-        this.cameraLastFrameName = cameraLastFrameName;
-        this.lastCamerasFrame = lastCamerasFrame;
-        this.lidarLastFrameName = lidarLastFrameName;
-        this.lastLiDarWorkerTrackersFrame = lastLiDarWorkerTrackersFrame;
-        this.poses = poses;
-        this.statistics = statistics;
+    public ErrorOutput() {
+        this.error = "";
+        this.faultySensor = "";
+        this.cameraLastFrameName = "";
+        this.lastCamerasFrame = new StampedDetectedObjects();
+        this.lidarLastFrameName = "";
+//        this.lastLiDarWorkerTrackersFrame = new;
+//        this.poses = poses;
     }
+
+
+
+    // Getters and Setters
+    public String getError() {
+        return error;
+    }
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getFaultySensor() {
+        return faultySensor;
+    }
+
+    public void setFaultySensor(String faultySensor) {
+        this.faultySensor = faultySensor;
+    }
+
+    public String getCameraLastFrameName() {
+        return cameraLastFrameName;
+    }
+
+    public void setCameraLastFrameName(String cameraLastFrameName) {
+        this.cameraLastFrameName = cameraLastFrameName;
+    }
+
+    public StampedDetectedObjects getLastCamerasFrame() {
+        return lastCamerasFrame;
+    }
+
+    public void setLastCamerasFrame(StampedDetectedObjects lastCamerasFrame) {
+        this.lastCamerasFrame = lastCamerasFrame;
+    }
+
+    public String getLidarLastFrameName() {
+        return lidarLastFrameName;
+    }
+
+    public void setLidarLastFrameName(String lidarLastFrameName) {
+        this.lidarLastFrameName = lidarLastFrameName;
+    }
+
+    public StampedCloudPoints getLastLiDarWorkerTrackersFrame() {
+        return lastLiDarWorkerTrackersFrame;
+    }
+
+    public void setLastLiDarWorkerTrackersFrame(StampedCloudPoints lastLiDarWorkerTrackersFrame) {
+        this.lastLiDarWorkerTrackersFrame = lastLiDarWorkerTrackersFrame;
+    }
+
+    public Pose[] getPoses() {
+        return poses;
+    }
+
+    public void setPoses(Pose[] poses) {
+        this.poses = poses;
+    }
+
 }

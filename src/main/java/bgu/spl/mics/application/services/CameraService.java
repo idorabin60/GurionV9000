@@ -62,7 +62,7 @@ public class CameraService extends MicroService {
                 //if there is no data or the list is empty
                 camera.setStatus(STATUS.DOWN);
                 terminate();
-                sendBroadcast(new TerminatedBroadcast(getName()));
+                sendBroadcast(new TerminatedBroadcast("Camera"));
             }
             else { //there is data to read and status = up
                 StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick-camera.getFrequency());
