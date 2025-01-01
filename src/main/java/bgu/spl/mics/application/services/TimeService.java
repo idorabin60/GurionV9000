@@ -5,6 +5,7 @@ import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
+import bgu.spl.mics.application.objects.SystemServicesCountDownLatch;
 
 import java.util.Objects;
 
@@ -36,9 +37,6 @@ public class TimeService extends MicroService {
      */
     @Override
     protected void initialize() {
-        sendBroadcast(new TickBroadcast(0));
-        this.currentTick++;
-
         subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
             if (currentTick > duration) {
                 sendBroadcast(new TerminatedBroadcast("TimeService"));
@@ -47,7 +45,7 @@ public class TimeService extends MicroService {
                 try {
                     Thread.sleep(tickInterval * 1000);
                     currentTick++;
-                    sendBroadcast(new TickBroadcast(currentTick * (tickInterval * 1000)));
+                    sendBroadcast(new TickBroadcast(currentTick));
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -56,12 +54,21 @@ public class TimeService extends MicroService {
 
         });
         subscribeBroadcast(TerminatedBroadcast.class, terminatedBroadcast -> {
-            if (Objects.equals(terminatedBroadcast.getSender(), "FusionSlam")){
+            if (Objects.equals(terminatedBroadcast.getSender(), "FusionSlam")) {
                 sendBroadcast(new TerminatedBroadcast("TimeService"));
             }
         });
         subscribeBroadcast(CrashedBroadcast.class, terminatedBroadcast -> {
             terminate();
         });
+        try {
+            System.out.println("waiting for services to be inited");
+            SystemServicesCountDownLatch.getInstance().getCountDownLatch().await();
+            Thread.sleep(10000); // Allow other services to settle
+            sendBroadcast(new TickBroadcast(currentTick));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
