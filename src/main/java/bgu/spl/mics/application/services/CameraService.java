@@ -6,10 +6,7 @@ import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
-import bgu.spl.mics.application.objects.Camera;
-import bgu.spl.mics.application.objects.DetectedObject;
-import bgu.spl.mics.application.objects.STATUS;
-import bgu.spl.mics.application.objects.StampedDetectedObjects;
+import bgu.spl.mics.application.objects.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,33 +46,36 @@ public class CameraService extends MicroService {
 
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
-           if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("FusionSlamService")) {
-               camera.setStatus(STATUS.DOWN);
-               terminate();
-           }
+            if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("FusionSlamService")) {
+                camera.setStatus(STATUS.DOWN);
+                terminate();
+            }
         });
 
         // Subscribe to TickBroadcast
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             currentTick = tick.getCurrentTick();
-            if (camera.getLifeCycle()<1){
+            if (camera.getLifeCycle() < 1) {
                 //if there is no data or the list is empty
                 camera.setStatus(STATUS.DOWN);
                 terminate();
                 sendBroadcast(new TerminatedBroadcast("Camera"));
-            }
-            else { //there is data to read and status = up
-                StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick-camera.getFrequency());
+            } else { //there is data to read and status = up
+                StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick - camera.getFrequency());
+                if (objectsAtTimeT == null) {
+                    System.out.println(getName() + " found no detected objects at tick " + currentTick);
+                    return; // Skip further processing
+                }
                 //iterate all the objects and see if there is an object of id:ERROR
                 List<DetectedObject> objects = objectsAtTimeT.getDetectedObjects();
                 for (DetectedObject obj : objects) {
-                    if (obj.getId().equals("ERROR")){
+                    if (obj.getId().equals("ERROR")) {
                         camera.setStatus(STATUS.ERROR);
                         //send crashed Broadcast
                         errorOutput.setError(obj.getDescription());
                         errorOutput.setFaultySensor(this.getName());
                         errorOutput.setCameraLastFrameName(this.getName());
-                        sendBroadcast(new CrashedBroadcast(obj.getId(),obj.getDescription()));
+                        sendBroadcast(new CrashedBroadcast(obj.getId(), obj.getDescription()));
                         break;
                     }
                 }
@@ -83,7 +83,7 @@ public class CameraService extends MicroService {
                 // Send DetectObjectsEvent
                 sendEvent(new DetectObjectsEvent(objectsAtTimeT));
                 //decrease camera life cycle
-                camera.setLifeCycle(camera.getLifeCycle()-1);
+                camera.setLifeCycle(camera.getLifeCycle() - 1);
                 System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());
                 //update the statistical folder
                 statisticalFolder.incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
@@ -95,7 +95,9 @@ public class CameraService extends MicroService {
             camera.setStatus(STATUS.DOWN);
             terminate();
         });
-    }
+        SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
 
     }
+
+}
 

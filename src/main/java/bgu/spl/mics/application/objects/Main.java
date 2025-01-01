@@ -54,7 +54,7 @@ public class Main {
             });
             System.out.println("\n");
             System.out.println("Lidar DB data");
-            System.out.println(lidarDataBase.toString());
+//            System.out.println(lidarDataBase.toString());
 
             System.out.println("\n");
             System.out.println("GpsData:");
@@ -84,6 +84,10 @@ public class Main {
 
             //Time Service:
             microserviceThreads.add(new Thread(new TimeService(tickTime,duration)));
+
+            //letch inting:
+            int numberOfServices = cameras.size() + lidarWorkers.size() + 2;
+            SystemServicesCountDownLatch.init(numberOfServices);
             for (Thread thread : microserviceThreads) {
                 thread.start();
             }
