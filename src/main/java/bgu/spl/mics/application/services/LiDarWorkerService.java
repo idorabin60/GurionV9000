@@ -52,6 +52,7 @@ public class LiDarWorkerService extends MicroService {
             }
         });
         SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
+        System.out.println("LidarWrokerService service Subscribed process finished");
 
     }
 }

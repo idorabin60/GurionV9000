@@ -96,6 +96,8 @@ public class CameraService extends MicroService {
             terminate();
         });
         SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
+        System.out.println("Camera service Subscribed process finished");
+
 
     }
 

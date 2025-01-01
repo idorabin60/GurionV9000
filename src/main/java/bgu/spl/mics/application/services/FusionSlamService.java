@@ -85,6 +85,8 @@ public class FusionSlamService extends MicroService {
             terminate();
         });
         SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
+        System.out.println("FusionSlam service Subscribed process finished");
+
 
 
     }
