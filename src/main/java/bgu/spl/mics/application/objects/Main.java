@@ -31,6 +31,11 @@ public class Main {
             System.out.println("\nInitialized Cameras:");
             cameras.forEach(System.out::println);
 
+            // Initialize GPSIMU
+            GPSIMU gpsimu = initializeGPSIMU(configFilePath);
+            System.out.println("\nGPSIMU Initialized with Pose List:");
+            gpsimu.getPoseList().forEach(System.out::println);
+
         } catch (IOException e) {
             handleError("Failed to load configuration file", e);
         } catch (RuntimeException e) {
@@ -83,6 +88,12 @@ public class Main {
         List<Camera> cameras = CameraDataUpdater.initializeCamerasFromConfig(configFilePath);
         CameraDataUpdater.updateCamerasFromJson(cameras, configFilePath);
         return cameras;
+    }
+
+    private static GPSIMU initializeGPSIMU(String configFilePath) {
+        GPSIMUDataBase gpsimuDataBase = GPSIMUDataBase.getInstance();
+        gpsimuDataBase.initialize(configFilePath);
+        return gpsimuDataBase.getGPSIMU();
     }
 
     private static void handleError(String message, Exception e) {
