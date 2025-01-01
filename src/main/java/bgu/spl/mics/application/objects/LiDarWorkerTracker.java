@@ -21,8 +21,6 @@ public class LiDarWorkerTracker {
     private int currentTick;
 
 
-
-
     public LiDarWorkerTracker(int id, int frequency) {
         this.id = id;
         this.frequency = frequency;
@@ -44,7 +42,8 @@ public class LiDarWorkerTracker {
     public STATUS getStatus() {
         return status;
     }
-    public void updateCurrentTick(int tick){
+
+    public void updateCurrentTick(int tick) {
         this.currentTick = tick;
     }
 
@@ -71,6 +70,7 @@ public class LiDarWorkerTracker {
     public void setFrequency(int frequency) {
         this.frequency = frequency;
     }
+
     public List<TrackedObjectsEvent> getReadyEvents() {
         List<TrackedObjectsEvent> readyEvents = trackedObjectsEventList.stream()
                 .filter(event -> currentTick >= event.getTrackedObjects().get(0).getTime() + frequency)
@@ -81,6 +81,7 @@ public class LiDarWorkerTracker {
 
         return readyEvents;
     }
+
     public void addDetectedObjectsEvent(DetectObjectsEvent event) {
         List<TrackedObject> trackedObjects = new ArrayList<>();
         LiDarDataBase db = LiDarDataBase.getInstance();
@@ -107,8 +108,22 @@ public class LiDarWorkerTracker {
             System.out.println("Added TrackedObjectsEvent with " + trackedObjects.size() + " objects to the list.");
         }
     }
+
     public List<TrackedObjectsEvent> getTrackedObjectsEventList() {
         return trackedObjectsEventList;
     }
+
+    @Override
+    public String toString() {
+        return "LiDarWorkerTracker{" +
+                "id=" + id +
+                ", frequency=" + frequency +
+                ", status=" + status +
+                ", lastTrackedObjects=" + lastTrackedObjects +
+                ", trackedObjectsEventListSize=" + (trackedObjectsEventList != null ? trackedObjectsEventList.size() : 0) +
+                ", currentTick=" + currentTick +
+                '}';
+    }
+
 
 }

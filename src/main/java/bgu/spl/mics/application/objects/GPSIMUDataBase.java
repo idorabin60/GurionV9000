@@ -58,7 +58,6 @@ public class GPSIMUDataBase {
             // Set the PoseList field in the GPSIMU instance
             gpsimu.setPoseList(poseList);
 
-            System.out.println("GPS/IMU Pose data loaded successfully from " + poseDataPath);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load GPS/IMU Pose data from file: " + poseDataPath, e);
         }

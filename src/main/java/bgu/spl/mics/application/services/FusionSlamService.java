@@ -23,11 +23,11 @@ public class FusionSlamService extends MicroService {
     private AtomicInteger numsOfCameras;
     private AtomicInteger numsOfLiDars;
 
-    public FusionSlamService(FusionSlam fusionSlam) {
+    public FusionSlamService(FusionSlam fusionSlam,int numberOfCameras, int numberOfLiDars) {
         super("FusionSlam");
         this.fusionSlam=fusionSlam.getInstance();
-        this.numsOfLiDars =  new AtomicInteger(0);
-        this.numsOfCameras= new AtomicInteger(0);
+        this.numsOfLiDars =  new AtomicInteger(numberOfLiDars);
+        this.numsOfCameras= new AtomicInteger(numberOfCameras);
     }
 
     /**
