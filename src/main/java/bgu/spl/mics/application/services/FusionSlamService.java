@@ -1,10 +1,7 @@
 package bgu.spl.mics.application.services;
 
 import bgu.spl.mics.MicroService;
-import bgu.spl.mics.application.objects.FusionSlam;
-import bgu.spl.mics.application.objects.LandMark;
-import bgu.spl.mics.application.objects.STATUS;
-import bgu.spl.mics.application.objects.TrackedObject;
+import bgu.spl.mics.application.objects.*;
 import bgu.spl.mics.application.messages.*;
 
 import java.util.List;
@@ -98,6 +95,7 @@ public class FusionSlamService extends MicroService {
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
             // not to do anything because it will end in the terminate Broadcast
         });
+        SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
 
     }
 }
