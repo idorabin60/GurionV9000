@@ -44,14 +44,6 @@ public class CameraService extends MicroService {
         System.out.println(getName() + " for camera " + camera.getId() + " started");
         camera.setStatus(STATUS.UP);
 
-        //Subscribe to TerminateBroadcast
-        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
-            if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("FusionSlamService")) {
-                camera.setStatus(STATUS.DOWN);
-                terminate();
-            }
-        });
-
         // Subscribe to TickBroadcast
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             currentTick = tick.getCurrentTick();
@@ -59,7 +51,7 @@ public class CameraService extends MicroService {
                 //if there is no data or the list is empty
                 camera.setStatus(STATUS.DOWN);
                 terminate();
-                sendBroadcast(new TerminatedBroadcast("Camera"));
+                sendBroadcast(new TerminatedBroadcast("CameraService"));
             } else { //there is data to read and status = up
                 StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick - camera.getFrequency());
                 if (objectsAtTimeT == null) {
@@ -90,9 +82,19 @@ public class CameraService extends MicroService {
             }
         });
 
+        //Subscribe to TerminateBroadcast
+        subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
+            if (termBrocast.getSender().equals("TimeService")) {
+                camera.setStatus(STATUS.DOWN);
+                sendBroadcast(new TerminatedBroadcast(("CameraService")));
+                terminate();
+            }
+        });
+
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
             camera.setStatus(STATUS.DOWN);
+            sendBroadcast(new TerminatedBroadcast(("CameraService")));
             terminate();
         });
         SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();

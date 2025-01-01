@@ -56,9 +56,11 @@ public class TimeService extends MicroService {
         subscribeBroadcast(TerminatedBroadcast.class, terminatedBroadcast -> {
             if (Objects.equals(terminatedBroadcast.getSender(), "FusionSlam")) {
                 sendBroadcast(new TerminatedBroadcast("TimeService"));
+                terminate();
             }
         });
         subscribeBroadcast(CrashedBroadcast.class, terminatedBroadcast -> {
+            sendBroadcast(new TerminatedBroadcast("TimeService"));
             terminate();
         });
         try {

@@ -80,10 +80,10 @@ public class FusionSlamService extends MicroService {
              if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("PoseService") ) {
                 this.numsOfMainService.addAndGet(-1);
             }
-             else if (termBrocast.getSender().equals("Camera")) {
+             else if (termBrocast.getSender().equals("CameraService")) {
                  numsOfCameras.addAndGet(-1);
              }
-             else if (termBrocast.getSender().equals("LiDar")){
+             else if (termBrocast.getSender().equals("LiDarService")){
                  numsOfLiDars.addAndGet(-1);
              }
 

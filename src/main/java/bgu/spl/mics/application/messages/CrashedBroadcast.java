@@ -18,6 +18,7 @@ public class CrashedBroadcast implements Broadcast {
     public String getErrorMessage() {
         return errorMessage;
     }
+
 }
 
 
