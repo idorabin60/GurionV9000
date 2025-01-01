@@ -1,4 +1,5 @@
 package bgu.spl.mics.application.objects;
+
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -9,46 +10,50 @@ import java.util.ArrayList;
  * Implements the Singleton pattern to ensure a single instance of FusionSlam exists.
  */
 public class FusionSlam {
-        // Fields
-        private ArrayList<LandMark> landmarks; // Represents the map of the environment
-        private ArrayList<Pose> poses;     // Represents previous poses needed for calculations
+    // Fields
+    private ArrayList<LandMark> landmarks; // Represents the map of the environment
+    private ArrayList<Pose> poses;     // Represents previous poses needed for calculations
 
 
-        // Constructor
-        public FusionSlam(){
-            landmarks = new ArrayList<LandMark>();
-            poses = new ArrayList<Pose>();
-        }
-
-        //Singleton
-        private static class FusionSlamHolder{
-            private static final FusionSlam instance = new FusionSlam();
-        }
-        public static FusionSlam getInstance(){
-            return FusionSlamHolder.instance;
-        }
-
-        // Getters and Setters
-        public void addPose(Pose pose) {
-            poses.add(pose);
-        }
-        public Pose getPose(int time){
-            try {
-                return poses.get(time - 1);
-            } catch (IndexOutOfBoundsException e) {
-                return null;
-            }
-        }
-    //Return if there is LankMark like this and null otherwise
-    public LandMark getLankMark (String id){
-            for (LandMark l : landmarks){
-                if (l.getId().equals(id))
-                    return l;
-            }
-            return null;
+    // Constructor
+    public FusionSlam() {
+        landmarks = new ArrayList<LandMark>();
+        poses = new ArrayList<Pose>();
     }
-    public void addLankMark(LandMark l){
-            landmarks.add(l);
+
+    //Singleton
+    private static class FusionSlamHolder {
+        private static final FusionSlam instance = new FusionSlam();
+    }
+
+    public static FusionSlam getInstance() {
+        return FusionSlamHolder.instance;
+    }
+
+    // Getters and Setters
+    public void addPose(Pose pose) {
+        poses.add(pose);
+    }
+
+    public Pose getPose(int time) {
+        try {
+            return poses.get(time - 1);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
+    //Return if there is LankMark like this and null otherwise
+    public LandMark getLankMark(String id) {
+        for (LandMark l : landmarks) {
+            if (l.getId().equals(id))
+                return l;
+        }
+        return null;
+    }
+
+    public void addLankMark(LandMark l) {
+        landmarks.add(l);
     }
 
 
@@ -94,5 +99,8 @@ public class FusionSlam {
             }
         }
     }
-
+    public List<LandMark> getLandmarks() {
+        return landmarks;
     }
+
+}
