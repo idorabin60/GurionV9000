@@ -63,7 +63,7 @@ public class FusionSlamService extends MicroService {
         });
 
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
-            if (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 ){
+            if (numsOfCameras.get()<=0 || numsOfLiDars.get()<=0 ){
                 sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
             }
             else {
@@ -73,22 +73,30 @@ public class FusionSlamService extends MicroService {
 
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
-            //NEED TO ASK IDO
-            if (termBrocast.getSender().equals("TimeService")) {
-                ///NEED TO COMPLETE
+            boolean isEmptyCamerasAndLidars= (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 );
+            if (termBrocast.getSender().equals("TimeService") && isEmptyCamerasAndLidars) {
                 terminate();
+                ///AND PRINT THE OUTPUT
             }
-            else if (termBrocast.getSender().equals("Camera"))
+            else if (termBrocast.getSender().equals("Camera")) {
                 numsOfCameras.addAndGet(-1);
-            else if (termBrocast.getSender().equals("LiDar"))
+                if (isEmptyCamerasAndLidars){
+                    terminate();
+                    ///AND PRINT THE OUTPUT
+                }
+            }
+            else if (termBrocast.getSender().equals("LiDar")){
                 numsOfLiDars.addAndGet(-1);
-
+                if (isEmptyCamerasAndLidars){
+                    terminate();
+                    ///AND PRINT THE OUTPUT
+                }
+            }
         });
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
-            // DO WITH IDO - NEED TO END THE PROGRAM
-            terminate();
+            // not to do anything because it will end in the terminate Broadcast
         });
 
     }
