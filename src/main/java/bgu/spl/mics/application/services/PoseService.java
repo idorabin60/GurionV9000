@@ -32,6 +32,7 @@ public class PoseService extends MicroService {
      */
     @Override
     protected void initialize() {
+        gpsimu.setStatus(STATUS.UP);
         //Subscribe to tickBrodcast
         subscribeBroadcast(TickBroadcast.class, tick -> {
             if (tick.getCurrentTick()<gpsimu.getPoseList().size()) {
@@ -46,6 +47,12 @@ public class PoseService extends MicroService {
                 } else {
                     System.out.println(getName() + " found no pose for tick " + currentTick);
                 }
+            }
+            else {
+                //There is no data in pose
+                gpsimu.setStatus(STATUS.DOWN);
+                terminate();
+                sendBroadcast(new TerminatedBroadcast("PoseService"));
             }
 
         });

@@ -21,6 +21,7 @@ public class FusionSlamService extends MicroService {
     private AtomicInteger numsOfLiDars;
     private AtomicInteger numsOfMainService; //the shelter of TimeService and PoseService
     private boolean thereIsError;
+
     public FusionSlamService(FusionSlam fusionSlam,int numberOfCameras, int numberOfLiDars) {
         super("FusionSlam");
         this.fusionSlam=fusionSlam.getInstance();
@@ -43,14 +44,15 @@ public class FusionSlamService extends MicroService {
             List<TrackedObject> trackedObjects = event.getTrackedObjects();
             for (TrackedObject object : trackedObjects){
                 //convert coordinates to global
-                fusionSlam.trackedObjectToGlobal(object,fusionSlam.getPose(object.getTime()));
-                LandMark landMarkIsExists = fusionSlam.getLankMark(object.getId());
-                if (landMarkIsExists==null){ //A new lankMark
-                    fusionSlam.addLankMark(new LandMark(object.getId(), object.getDescription(), object.getCoordinates()));
-                    StatisticalFolder.getInstance().incrementDetectedObjects(1);
-                }
-                else{ //Need to update coordinates
-                    fusionSlam.updateLandmarkCoordinates(landMarkIsExists,object);
+                if ( fusionSlam.getPose(object.getTime())!=null) {
+                    fusionSlam.trackedObjectToGlobal(object, fusionSlam.getPose(object.getTime()));
+                    LandMark landMarkIsExists = fusionSlam.getLankMark(object.getId());
+                    if (landMarkIsExists == null) { //A new lankMark
+                        fusionSlam.addLankMark(new LandMark(object.getId(), object.getDescription(), object.getCoordinates()));
+                        StatisticalFolder.getInstance().incrementDetectedObjects(1);
+                    } else { //Need to update coordinates
+                        fusionSlam.updateLandmarkCoordinates(landMarkIsExists, object);
+                    }
                 }
             }
             complete(event, true);
