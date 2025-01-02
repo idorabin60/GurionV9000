@@ -1,6 +1,5 @@
 package bgu.spl.mics.application.services;
 
-import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
@@ -8,8 +7,8 @@ import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.objects.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * CameraService is responsible for processing data from the camera and
@@ -44,6 +43,7 @@ public class CameraService extends MicroService {
     protected void initialize() {
         System.out.println(getName() + " for camera " + camera.getId() + " started");
         camera.setStatus(STATUS.UP);
+        AtomicBoolean isError = new AtomicBoolean(false);
 
         // Subscribe to TickBroadcast
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
@@ -66,26 +66,33 @@ public class CameraService extends MicroService {
                 List<DetectedObject> objects = objectsAtTimeT.getDetectedObjects();
                 for (DetectedObject obj : objects) {
                     if (obj.getId().equals("ERROR")) {
+                        System.out.println(this.currentTick +"tick of the Error");
+                        System.out.println("FOUND AN ERRO CRASH THE SYSTEM");
                         camera.setStatus(STATUS.ERROR);
                         //send crashed Broadcast
                         ErrorOutput.getInstance().setError(obj.getDescription());
                         ErrorOutput.getInstance().setFaultySensor(this.getName());
                         ErrorOutput.getInstance().addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
                         sendBroadcast(new CrashedBroadcast("CameraService"));
+                        isError.set(true);
                         terminate();
-                        break;
+
+
                     }
                 }
-                //there is no error
-                //decrease camera life cycle
-                camera.setLifeCycle(camera.getLifeCycle() - 1);
-                camera.setLastStampedDetectedObjects(objectsAtTimeT);
-                System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());
-                //update the statistical folder
-                StatisticalFolder.getInstance().incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
-                // Send DetectObjectsEvent
-                sendEvent(new DetectObjectsEvent(objectsAtTimeT));
-            }
+                if (isError.get()==false) {
+                    //there is no error
+                    //decrease camera life cycle
+                    camera.setLifeCycle(camera.getLifeCycle() - 1);
+                    camera.setLastStampedDetectedObjects(objectsAtTimeT);
+                    System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());
+                    //update the statistical folder
+                    StatisticalFolder.getInstance().incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
+                    // Send DetectObjectsEvent
+                    sendEvent(new DetectObjectsEvent(objectsAtTimeT));
+                }
+                }
+
         });
 
         //Subscribe to TerminateBroadcast
