@@ -14,6 +14,7 @@ public class Camera {
     private STATUS status;
     private List<StampedDetectedObjects> detectedObjectsList;
     private int lifeCycle;
+    private StampedDetectedObjects lastStampedDetectedObjects; //For crashing
 
     public Camera(int id, int frequency, STATUS status) {
         this.id = id;
@@ -21,6 +22,7 @@ public class Camera {
         this.status = status;
         this.detectedObjectsList = new ArrayList<>();
         this.lifeCycle = 0;
+        this.lastStampedDetectedObjects=new StampedDetectedObjects();
     }
 
     // Getter for id
@@ -67,8 +69,12 @@ public class Camera {
         }
         return null;
     }
-    // Setter for detectedObjectsList
-
+    public void setLastStampedDetectedObjects(StampedDetectedObjects UpdatedLastObject){
+        this.lastStampedDetectedObjects=UpdatedLastObject;
+    }
+    public StampedDetectedObjects getLastStampedDetectedObjects(){
+        return this.lastStampedDetectedObjects;
+    }
 
     // Method to add a single detected object
 
