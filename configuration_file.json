@@ -5,16 +5,6 @@
         "id": 1,
         "frequency": 0,
         "camera_key": "camera1"
-      },
-      {
-        "id": 2,
-        "frequency": 1,
-        "camera_key": "camera2"
-      },
-      {
-        "id": 3,
-        "frequency": 2,
-        "camera_key": "camera3"
       }
     ],
     "camera_datas_path": "./camera_data.json"
@@ -24,13 +14,8 @@
       {
         "id": 1,
         "frequency": 0
-      },
-      {
-        "id": 2,
-        "frequency": 12
       }
     ],
-
     "lidars_data_path": "./lidar_data.json"
   },
   "poseJsonFile": "./pose_data.json",

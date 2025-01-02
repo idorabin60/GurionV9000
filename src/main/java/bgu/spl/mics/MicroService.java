@@ -175,7 +175,8 @@ public abstract class MicroService implements Runnable {
         } catch (InterruptedException e) {
            Thread.currentThread().interrupt();
         } finally {
-            messageBus.unregister(this); // Unregister from the MessageBus
+            messageBus.unregister(this);
+            System.out.println("MICRO SERVICE FINISHED ITS WORK:" + this.name);// Unregister from the MessageBus
         }
     }
 }

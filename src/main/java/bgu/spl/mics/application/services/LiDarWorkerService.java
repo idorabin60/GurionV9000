@@ -49,6 +49,7 @@ public class LiDarWorkerService extends MicroService {
         subscribeBroadcast(TerminatedBroadcast.class, broadcast -> {
             if (broadcast.getSender().equals("TimeService")) {
                 lidarTracker.setStatus(STATUS.DOWN);
+                sendBroadcast(new TerminatedBroadcast(("LiDarService")));
                 terminate();
             }
         });
