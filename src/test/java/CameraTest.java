@@ -60,7 +60,7 @@ public class CameraTest {
         assertEquals("Wall_5", result.getDetectedObjects().get(0).getId(), "The first detected object's ID should match");
     }
 }
-
+//blaa
 
 
 
