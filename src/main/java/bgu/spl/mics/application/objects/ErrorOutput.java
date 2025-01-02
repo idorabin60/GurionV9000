@@ -47,6 +47,10 @@ public class ErrorOutput {
         this.faultySensor = faultySensor;
     }
 
+    public void addLiDarFrame(String name,List<TrackedObject> liDarFrame) {
+        this.lastFramesLiDars.put(name, liDarFrame);
+    }
+
     public void addCameraFrame (String name,StampedDetectedObjects object){
         this.lastFramesCameras.put(name, object);
     }

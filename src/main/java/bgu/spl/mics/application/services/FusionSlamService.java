@@ -64,7 +64,7 @@ public class FusionSlamService extends MicroService {
 
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
             //ASK IDO
-            if (numsOfCameras.get()<=0 || numsOfLiDars.get()<=0 ){
+            if (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 ){
                 sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
             }
             else {
@@ -74,7 +74,7 @@ public class FusionSlamService extends MicroService {
 
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
-            boolean isEmptyCamerasAndLidars= (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 );
+            System.out.println(termBrocast.getSender());
              if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("PoseService") ) {
                 this.numsOfMainService.addAndGet(-1);
             }
@@ -84,22 +84,31 @@ public class FusionSlamService extends MicroService {
              else if (termBrocast.getSender().equals("LiDarService")){
                  numsOfLiDars.addAndGet(-1);
              }
-
-             if (isEmptyCamerasAndLidars && numsOfMainService.get()==0){
+            boolean isEmptyCamerasAndLidars= (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 );
+            if (isEmptyCamerasAndLidars && numsOfMainService.get()==0){
                 terminate();
                 ///AND PRINT THE OUTPUT
             }
-            else if (isEmptyCamerasAndLidars && numsOfMainService.get()>0){
-                sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
+            else {
+                try {
+                    Thread.sleep(500);
+                    sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
+
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
         });
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
-            // ido
-            this.thereIsError = true;
-            // not to do anything because it will end in the terminate Broadcast
+             if (terminate.getSender().equals("CameraService")) {
+                numsOfCameras.addAndGet(-1);
+            }
+            else {
+                numsOfLiDars.addAndGet(-1);
+            }
         });
         SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
 

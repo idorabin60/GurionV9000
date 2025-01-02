@@ -54,7 +54,7 @@ public class TimeService extends MicroService {
 
         });
         subscribeBroadcast(TerminatedBroadcast.class, terminatedBroadcast -> {
-            if (Objects.equals(terminatedBroadcast.getSender(), "FusionSlam")) {
+            if (Objects.equals(terminatedBroadcast.getSender(), "FusionSlamService")) {
                 sendBroadcast(new TerminatedBroadcast("TimeService"));
                 terminate();
             }
@@ -66,7 +66,7 @@ public class TimeService extends MicroService {
         try {
             System.out.println("waiting for services to be inited");
             SystemServicesCountDownLatch.getInstance().getCountDownLatch().await();
-            Thread.sleep(7000); // Allow other services to settle
+            Thread.sleep(500); // Allow other services to settle
             sendBroadcast(new TickBroadcast(currentTick));
 
         } catch (Exception e) {

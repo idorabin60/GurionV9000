@@ -27,6 +27,7 @@ public class LiDarWorkerService extends MicroService {
         subscribeBroadcast(TickBroadcast.class, tick -> {
             if (LiDarDataBase.getInstance().getCounterOfTrackedCloudPoints().get() <= 0) {
                 System.out.println("FININSHED ALL OF THE LIDAR WORK" + LiDarDataBase.getInstance().getCounterOfTrackedCloudPoints().get());
+                System.out.println("LastTrackedObjectsList = "+lidarTracker.getLastTrackedObjects());
                 sendBroadcast(new TerminatedBroadcast("LiDarService"));
                 terminate();
             } else {
@@ -34,6 +35,20 @@ public class LiDarWorkerService extends MicroService {
 
                 // Process events and send them directly from the microservice
                 lidarTracker.getReadyEvents().forEach(event -> {
+                    event.getTrackedObjects().forEach(trackedObject -> {
+                        if (trackedObject.getId().equals("ERROR")){
+                            ErrorOutput.getInstance().setError(trackedObject.getDescription());
+                            ErrorOutput.getInstance().setFaultySensor(this.getName());
+                            ErrorOutput.getInstance().addLiDarFrame(this.getName(),this.lidarTracker.getLastTrackedObjects());
+                            sendBroadcast(new CrashedBroadcast("LiDarService"));
+                            lidarTracker.setStatus(STATUS.ERROR);
+                            terminate();
+
+//                            ErrorOutput.getInstance().
+                        }else {
+                            lidarTracker.getLastTrackedObjects().add(trackedObject);
+                        }
+                    });
                     sendEvent(event);
                     int numberOfTrackedObjectsInEvent = event.getTrackedObjects().size();
 
@@ -65,6 +80,8 @@ public class LiDarWorkerService extends MicroService {
             if (broadcast.getSender().equals("TimeService")||broadcast.getSender().equals("LiDarService")) {
                 lidarTracker.setStatus(STATUS.DOWN);
                 sendBroadcast(new TerminatedBroadcast(("LiDarService")));
+                System.out.println("LastTrackedObjectsList = "+lidarTracker.getLastTrackedObjects());
+
                 terminate();
             }
         });

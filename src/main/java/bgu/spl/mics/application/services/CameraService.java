@@ -71,8 +71,7 @@ public class CameraService extends MicroService {
                         ErrorOutput.getInstance().setError(obj.getDescription());
                         ErrorOutput.getInstance().setFaultySensor(this.getName());
                         ErrorOutput.getInstance().addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
-                        sendBroadcast(new TerminatedBroadcast("CameraService"));
-                        sendBroadcast(new CrashedBroadcast(obj.getId(), obj.getDescription()));
+                        sendBroadcast(new CrashedBroadcast("CameraService"));
                         terminate();
                         break;
                     }
