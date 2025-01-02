@@ -23,7 +23,10 @@ public class Main {
             JsonObject config = parseConfigFile(configFilePath);
             int tickTime = config.get("TickTime").getAsInt();
             int duration = config.get("Duration").getAsInt();
+            System.out.println("TickTime: " + tickTime);
             String lidarDataPath = config.getAsJsonObject("LidarWorkers").get("lidars_data_path").getAsString();
+            System.out.println("Attempting to load LiDAR data from: " + lidarDataPath);
+
             //init Lidar DB
             LiDarDataBase lidarDataBase = loadLidarData(lidarDataPath);
             lidarDataBase.setCounterOfTrackedCloudPoints(LiDarDataBase.getInstance().getCloudPoints().size());
@@ -163,4 +166,4 @@ public class Main {
         e.printStackTrace();
     }
 
-}
+}//bla:

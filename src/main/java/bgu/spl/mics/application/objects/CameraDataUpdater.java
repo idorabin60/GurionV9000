@@ -61,14 +61,25 @@ public class CameraDataUpdater {
 
             // Read and parse the camera data JSON file
             try (FileReader cameraDataReader = new FileReader(cameraDataPath)) {
-                Type cameraDataMapType = new TypeToken<Map<String, List<StampedDetectedObjects>>>() {}.getType();
-                Map<String, List<StampedDetectedObjects>> cameraData = gson.fromJson(cameraDataReader, cameraDataMapType);
+                JsonObject cameraDataJson = gson.fromJson(cameraDataReader, JsonObject.class);
 
-                // Update each camera's detectedObjectsList
+                // Process each camera key
                 for (Camera camera : cameras) {
                     String cameraKey = "camera" + camera.getId(); // Match keys like "camera1"
-                    if (cameraData.containsKey(cameraKey)) {
-                        camera.updateDetectedObjects(cameraData.get(cameraKey));
+                    if (cameraDataJson.has(cameraKey)) {
+                        // Flatten the nested arrays
+                        List<List<StampedDetectedObjects>> nestedLists = gson.fromJson(
+                                cameraDataJson.getAsJsonArray(cameraKey),
+                                new TypeToken<List<List<StampedDetectedObjects>>>() {}.getType()
+                        );
+
+                        List<StampedDetectedObjects> flattenedList = new ArrayList<>();
+                        for (List<StampedDetectedObjects> innerList : nestedLists) {
+                            flattenedList.addAll(innerList);
+                        }
+
+                        // Update the camera with the flattened list
+                        camera.updateDetectedObjects(flattenedList);
                     }
                 }
             }
@@ -76,4 +87,5 @@ public class CameraDataUpdater {
             throw new RuntimeException("Failed to update cameras from JSON: " + e.getMessage(), e);
         }
     }
+
 }
