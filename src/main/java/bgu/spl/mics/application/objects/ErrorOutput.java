@@ -1,4 +1,5 @@
 package bgu.spl.mics.application.objects;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,7 +9,7 @@ public class ErrorOutput {
     private String faultySensor; //The sensor that causes that caused the error
     private  ConcurrentHashMap<String, StampedDetectedObjects> lastFramesCameras;
     private  ConcurrentHashMap<String, List<TrackedObject>> lastFramesLiDars;
-    private Pose[]poses;
+    private ArrayList<Pose> poses;
 
     // Constructor to initialize all fields
     public ErrorOutput() {
@@ -16,7 +17,7 @@ public class ErrorOutput {
         this.faultySensor = "";
         this.lastFramesCameras = new ConcurrentHashMap<String, StampedDetectedObjects>();
         this.lastFramesLiDars = new ConcurrentHashMap<String, List<TrackedObject>>();
-       this.poses = null;
+        this.poses =new ArrayList<Pose>();
     }
 
     // Singleton pattern
@@ -49,12 +50,10 @@ public class ErrorOutput {
     public void addCameraFrame (String name,StampedDetectedObjects object){
         this.lastFramesCameras.put(name, object);
     }
-    public Pose[] getPoses() {
+    public void setPoses (ArrayList<Pose> currentPoses){
+        this.poses = currentPoses;
+    }
+    public ArrayList<Pose> getPoses() {
         return poses;
     }
-
-    public void setPoses(Pose[] poses) {
-        this.poses = poses;
-    }
-
-}//bla
+}

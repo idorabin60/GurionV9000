@@ -67,9 +67,9 @@ public class CameraService extends MicroService {
                     if (obj.getId().equals("ERROR")) {
                         camera.setStatus(STATUS.ERROR);
                         //send crashed Broadcast
-                        errorOutput.setError(obj.getDescription());
-                        errorOutput.setFaultySensor(this.getName());
-                        errorOutput.addCameraFrame(this.getName(), camera.getLastStampedDetectedObjects());
+                        ErrorOutput.getInstance().setError(obj.getDescription());
+                        ErrorOutput.getInstance().setFaultySensor(this.getName());
+                        ErrorOutput.getInstance().addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
                         sendBroadcast(new TerminatedBroadcast("CameraService"));
                         sendBroadcast(new CrashedBroadcast(obj.getId(), obj.getDescription()));
                         terminate();
@@ -82,7 +82,7 @@ public class CameraService extends MicroService {
                 camera.setLastStampedDetectedObjects(objectsAtTimeT);
                 System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());
                 //update the statistical folder
-                statisticalFolder.incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
+                StatisticalFolder.getInstance().incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
                 // Send DetectObjectsEvent
                 sendEvent(new DetectObjectsEvent(objectsAtTimeT));
             }
@@ -99,7 +99,7 @@ public class CameraService extends MicroService {
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
-            errorOutput.addCameraFrame(this.getName(), camera.getLastStampedDetectedObjects());
+           ErrorOutput.getInstance().addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
             camera.setStatus(STATUS.DOWN);
             sendBroadcast(new TerminatedBroadcast(("CameraService")));
             terminate();
