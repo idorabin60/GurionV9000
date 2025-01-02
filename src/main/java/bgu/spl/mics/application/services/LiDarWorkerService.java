@@ -37,7 +37,7 @@ public class LiDarWorkerService extends MicroService {
                 lidarTracker.getReadyEvents().forEach(event -> {
                     event.getTrackedObjects().forEach(trackedObject -> {
                         if (trackedObject.getId().equals("ERROR")){
-                            ErrorOutput.getInstance().setError(trackedObject.getDescription());
+                            ErrorOutput.getInstance().setError("Connection to Lidar Failed");
                             ErrorOutput.getInstance().setFaultySensor(this.getName());
                             ErrorOutput.getInstance().addLiDarFrame(this.getName(),this.lidarTracker.getLastTrackedObjects());
                             sendBroadcast(new CrashedBroadcast("LiDarService"));
