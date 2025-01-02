@@ -5,10 +5,7 @@ import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.PoseEvent;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
-import bgu.spl.mics.application.objects.GPSIMU;
-import bgu.spl.mics.application.objects.Pose;
-import bgu.spl.mics.application.objects.STATUS;
-import bgu.spl.mics.application.objects.SystemServicesCountDownLatch;
+import bgu.spl.mics.application.objects.*;
 
 /**
  * PoseService is responsible for maintaining the robot's current pose (position and orientation)
@@ -55,6 +52,7 @@ public class PoseService extends MicroService {
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
+            ErrorOutput.getInstance().setPoses(this.gpsimu.getPoseListByTime(this.gpsimu.getCurrentTick()));
             gpsimu.setStatus(STATUS.DOWN);
             sendBroadcast(new TerminatedBroadcast(("PoseService")));
             terminate();

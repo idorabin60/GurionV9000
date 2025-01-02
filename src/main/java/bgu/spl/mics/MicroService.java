@@ -28,8 +28,6 @@ public abstract class MicroService implements Runnable {
     private final String name;
     private ConcurrentHashMap<Class<?>, Callback<?>> callbacks; // Maps message types to their callbacks
     private MessageBus messageBus; // Reference to the MessageBus singleton
-    protected StatisticalFolder statisticalFolder;
-    protected ErrorOutput errorOutput;
     /**
      * @param name the micro-service name (used mainly for debugging purposes -
      *             does not have to be unique)
@@ -38,8 +36,6 @@ public abstract class MicroService implements Runnable {
         this.name = name;
         this.callbacks = new ConcurrentHashMap<>(); // Initialize the callbacks map
         this.messageBus = MessageBusImpl.getInstance(); // Assuming MessageBusImpl is a singleton
-        this.statisticalFolder = StatisticalFolder.getInstance();
-        this.errorOutput= ErrorOutput.getInstance();
     }
 
 
