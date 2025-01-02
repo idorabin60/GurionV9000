@@ -31,22 +31,15 @@ public class MessageBusImpl implements MessageBus {
 
     @Override
     public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-        lock.writeLock().lock();
-        try {
+
             eventSubscriptions.computeIfAbsent(type, key -> new LinkedBlockingQueue<>()).add(m);
-        } finally {
-            lock.writeLock().unlock();
-        }
     }
 
     @Override
     public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
-        lock.writeLock().lock();
-        try {
             broadcastSubscriptions.computeIfAbsent(type, key -> new CopyOnWriteArrayList<>()).add(m);
-        } finally {
-            lock.writeLock().unlock();
-        }
+
+
     }
 
     @Override

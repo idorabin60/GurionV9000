@@ -83,7 +83,7 @@ public class Main {
             microserviceThreads.add(new Thread(new PoseService(gpsimu)));
 
             //Time Service:
-            microserviceThreads.add(new Thread(new TimeService(tickTime,duration)));
+            microserviceThreads.add(new Thread(new TimeService(tickTime, duration)));
 
             //letch inting:
             int numberOfServices = cameras.size() + lidarWorkers.size() + 2;
@@ -91,10 +91,17 @@ public class Main {
             for (Thread thread : microserviceThreads) {
                 thread.start();
             }
-
-
-
-
+            for (Thread thread : microserviceThreads) {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            System.out.println("finisheddd");
+            FusionSlam.getInstance().getLandmarks().forEach(landmark -> {
+                System.out.println(landmark.toString());
+            });
 
 
         } catch (IOException e) {

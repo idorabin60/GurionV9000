@@ -66,7 +66,7 @@ public class TimeService extends MicroService {
         try {
             System.out.println("waiting for services to be inited");
             SystemServicesCountDownLatch.getInstance().getCountDownLatch().await();
-            Thread.sleep(10000); // Allow other services to settle
+            Thread.sleep(7000); // Allow other services to settle
             sendBroadcast(new TickBroadcast(currentTick));
 
         } catch (Exception e) {

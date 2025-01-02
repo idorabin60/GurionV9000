@@ -37,17 +37,20 @@ public class PoseService extends MicroService {
     protected void initialize() {
         //Subscribe to tickBrodcast
         subscribeBroadcast(TickBroadcast.class, tick -> {
-            int currentTick = tick.getCurrentTick();
-            gpsimu.setCurrentTick(currentTick);
-            Pose currentPose = gpsimu.getPose(currentTick);
-            // Retrieve the pose for the current tick
-            if (currentPose != null) {
-                // Create and send a PoseEvent with the current pose
-                sendEvent(new PoseEvent(currentPose));
-                System.out.println(getName() + " sent PoseEvent at tick " + currentTick);
-            } else {
-                System.out.println(getName() + " found no pose for tick " + currentTick);
+            if (tick.getCurrentTick()<gpsimu.getPoseList().size()) {
+                int currentTick = tick.getCurrentTick();
+                gpsimu.setCurrentTick(currentTick);
+                Pose currentPose = gpsimu.getPose(currentTick);
+                // Retrieve the pose for the current tick
+                if (currentPose != null) {
+                    // Create and send a PoseEvent with the current pose
+                    sendEvent(new PoseEvent(currentPose));
+                    System.out.println(getName() + " sent PoseEvent at tick " + currentTick);
+                } else {
+                    System.out.println(getName() + " found no pose for tick " + currentTick);
+                }
             }
+
         });
 
         // Subscribe to crashedBroadcast
