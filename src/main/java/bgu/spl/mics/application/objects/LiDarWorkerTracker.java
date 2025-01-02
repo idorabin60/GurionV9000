@@ -86,29 +86,47 @@ public class LiDarWorkerTracker {
         List<TrackedObject> trackedObjects = new ArrayList<>();
         LiDarDataBase db = LiDarDataBase.getInstance();
 
+        // Process each detected object
         for (DetectedObject detectedObject : event.getDetectedObjects()) {
             String objectId = detectedObject.getId();
             int eventTime = event.getTime();
 
+            // Find matching cloud points
             StampedCloudPoints matchingCloudPoints = db.getCloudPoints().stream()
                     .filter(cp -> cp.getId().equals(objectId) && cp.getTime() == eventTime)
                     .findFirst()
                     .orElse(null);
 
             if (matchingCloudPoints != null) {
+                // Add valid tracked object
                 ArrayList<CloudPoint> coordinates = new ArrayList<>();
-                matchingCloudPoints.getCloudPoints().forEach(p -> coordinates.add(new CloudPoint(p.get(0), p.get(1))));
+                matchingCloudPoints.getCloudPoints()
+                        .forEach(p -> coordinates.add(new CloudPoint(p.get(0), p.get(1))));
 
-                trackedObjects.add(new TrackedObject(objectId, eventTime, detectedObject.getDescription(), coordinates));
+                trackedObjects.add(new TrackedObject(
+                        objectId,
+                        eventTime,
+                        detectedObject.getDescription(),
+                        coordinates
+                ));
+            } else {
+                // Add an error tracked object
+                trackedObjects.add(new TrackedObject(
+                        "ERROR",
+                        eventTime,
+                        "No matching cloud points found for detected object with ID: " + objectId,
+                        new ArrayList<>()
+                ));
             }
         }
 
+        // Add tracked objects event if there are any tracked objects
         if (!trackedObjects.isEmpty()) {
             trackedObjectsEventList.add(new TrackedObjectsEvent(trackedObjects));
-            setLastTrackedObjects(trackedObjects);
             System.out.println("Added TrackedObjectsEvent with " + trackedObjects.size() + " objects to the list.");
         }
     }
+
 
     public List<TrackedObjectsEvent> getTrackedObjectsEventList() {
         return trackedObjectsEventList;
