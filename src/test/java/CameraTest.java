@@ -35,12 +35,32 @@ public class CameraTest {
     @Test
     void testGetDetectedObjectAtTimeT_ValidTime() {
         Camera camera = cameras.get(0);
-        int timeT = 1; // Replace with a valid timestamp from your configuration
+        int timeT = 1;
         StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(timeT);
         assertNotNull(result, "Result should not be null for a valid time");
     }
-}
 
+    @Test
+    void testGetDetectedObjectAtTimeT_InvalidTime() {
+        Camera camera = cameras.get(0);
+        int timeT = -1; // Invalid time
+        StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(timeT);
+        assertNull(result, "Result should be null for an invalid time");
+    }
+
+    @Test
+    void testGetDetectedObjectAtTimeT_FirstElement() {
+        Camera camera = cameras.get(0);
+        int timeT = 14; // First time in the list (replace with your actual first time)
+        StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(timeT);
+        // Assertions
+        assertNotNull(result, "Result should not be null for the first element");
+        assertEquals(14, result.getTime(), "The returned object's time should match the requested time");
+        assertEquals(1, result.getDetectedObjects().size(), "The number of detected objects should match");
+        assertEquals("Wall_5", result.getDetectedObjects().get(0).getId(), "The first detected object's ID should match");
+    }
+}
+//blaa
 
 
 
