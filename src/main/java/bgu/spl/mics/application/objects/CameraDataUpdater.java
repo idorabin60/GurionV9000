@@ -67,19 +67,27 @@ public class CameraDataUpdater {
                 for (Camera camera : cameras) {
                     String cameraKey = "camera" + camera.getId(); // Match keys like "camera1"
                     if (cameraDataJson.has(cameraKey)) {
-                        // Flatten the nested arrays
-                        List<List<StampedDetectedObjects>> nestedLists = gson.fromJson(
-                                cameraDataJson.getAsJsonArray(cameraKey),
-                                new TypeToken<List<List<StampedDetectedObjects>>>() {}.getType()
-                        );
+                        List<StampedDetectedObjects> detectedObjects = new ArrayList<>();
 
-                        List<StampedDetectedObjects> flattenedList = new ArrayList<>();
-                        for (List<StampedDetectedObjects> innerList : nestedLists) {
-                            flattenedList.addAll(innerList);
+                        // Try parsing as flat array
+                        try {
+                            detectedObjects = gson.fromJson(
+                                    cameraDataJson.getAsJsonArray(cameraKey),
+                                    new TypeToken<List<StampedDetectedObjects>>() {}.getType()
+                            );
+                        } catch (Exception e) {
+                            // If parsing fails, handle as nested arrays
+                            List<List<StampedDetectedObjects>> nestedLists = gson.fromJson(
+                                    cameraDataJson.getAsJsonArray(cameraKey),
+                                    new TypeToken<List<List<StampedDetectedObjects>>>() {}.getType()
+                            );
+                            for (List<StampedDetectedObjects> innerList : nestedLists) {
+                                detectedObjects.addAll(innerList);
+                            }
                         }
 
-                        // Update the camera with the flattened list
-                        camera.updateDetectedObjects(flattenedList);
+                        // Update the camera with the detected objects
+                        camera.updateDetectedObjects(detectedObjects);
                     }
                 }
             }
