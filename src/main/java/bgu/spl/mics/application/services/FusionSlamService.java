@@ -73,7 +73,6 @@ public class FusionSlamService extends MicroService {
 
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
-            System.out.println(termBrocast.getSender());
             boolean isEmptyCamerasAndLidars= (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 );
              if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("PoseService") ) {
                 this.numsOfMainService.addAndGet(-1);

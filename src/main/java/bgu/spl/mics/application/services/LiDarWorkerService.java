@@ -25,13 +25,28 @@ public class LiDarWorkerService extends MicroService {
 
         // Subscribe to TickBroadcast
         subscribeBroadcast(TickBroadcast.class, tick -> {
-            lidarTracker.updateCurrentTick(tick.getCurrentTick());
+            if (LiDarDataBase.getInstance().getCounterOfTrackedCloudPoints().get() <= 0) {
+                System.out.println("FININSHED ALL OF THE LIDAR WORK" + LiDarDataBase.getInstance().getCounterOfTrackedCloudPoints().get());
+                sendBroadcast(new TerminatedBroadcast("LiDarService"));
+                terminate();
+            } else {
+                lidarTracker.updateCurrentTick(tick.getCurrentTick());
 
-            // Process events and send them directly from the microservice
-            lidarTracker.getReadyEvents().forEach(event -> {
-                sendEvent(event);
-                System.out.println(getName() + " sent TrackedObjectsEvent at tick " + tick.getCurrentTick());
-            });
+                // Process events and send them directly from the microservice
+                lidarTracker.getReadyEvents().forEach(event -> {
+                    sendEvent(event);
+                    int numberOfTrackedObjectsInEvent = event.getTrackedObjects().size();
+
+                    // Atomically decrement the counter
+                    LiDarDataBase dbInstance = LiDarDataBase.getInstance();
+                    dbInstance.setCounterOfTrackedCloudPoints(dbInstance.getCounterOfTrackedCloudPoints().get() - numberOfTrackedObjectsInEvent);
+
+                    System.out.println(getName() + " sent TrackedObjectsEvent at tick " + tick.getCurrentTick());
+                });
+
+            }
+
+
         });
         subscribeEvent(DetectObjectsEvent.class, event -> {
             System.out.println(getName() + " received DetectObjectsEvent at tick " + event.getTime());
@@ -47,7 +62,7 @@ public class LiDarWorkerService extends MicroService {
 
         // Subscribe to TerminatedBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, broadcast -> {
-            if (broadcast.getSender().equals("TimeService")) {
+            if (broadcast.getSender().equals("TimeService")||broadcast.getSender().equals("LiDarService")) {
                 lidarTracker.setStatus(STATUS.DOWN);
                 sendBroadcast(new TerminatedBroadcast(("LiDarService")));
                 terminate();

@@ -26,6 +26,8 @@ public class Main {
             String lidarDataPath = config.getAsJsonObject("LidarWorkers").get("lidars_data_path").getAsString();
             //init Lidar DB
             LiDarDataBase lidarDataBase = loadLidarData(lidarDataPath);
+            lidarDataBase.setCounterOfTrackedCloudPoints(LiDarDataBase.getInstance().getCloudPoints().size());
+            System.out.println("lidar db counter!!!:"+LiDarDataBase.getInstance().getCounterOfTrackedCloudPoints() );
 
             // Initialize LiDAR workers
             List<JsonObject> lidarConfigs = parseLidarWorkerConfigs(config);
