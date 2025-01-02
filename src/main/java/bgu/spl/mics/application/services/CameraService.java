@@ -23,6 +23,7 @@ public class CameraService extends MicroService {
     private int currentTick;
 
 
+
     /**
      * Constructor for CameraService.
      *
@@ -68,7 +69,7 @@ public class CameraService extends MicroService {
                         //send crashed Broadcast
                         errorOutput.setError(obj.getDescription());
                         errorOutput.setFaultySensor(this.getName());
-                        errorOutput.addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
+                        errorOutput.addCameraFrame(this.getName(), camera.getLastStampedDetectedObjects());
                         sendBroadcast(new TerminatedBroadcast("CameraService"));
                         sendBroadcast(new CrashedBroadcast(obj.getId(), obj.getDescription()));
                         terminate();
@@ -98,7 +99,7 @@ public class CameraService extends MicroService {
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
-            errorOutput.addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
+            errorOutput.addCameraFrame(this.getName(), camera.getLastStampedDetectedObjects());
             camera.setStatus(STATUS.DOWN);
             sendBroadcast(new TerminatedBroadcast(("CameraService")));
             terminate();
