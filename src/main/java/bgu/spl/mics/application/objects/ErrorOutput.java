@@ -1,23 +1,21 @@
 package bgu.spl.mics.application.objects;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ErrorOutput {
 
     private String error; //A description of the source of the ERROR
     private String faultySensor; //The sensor that causes that caused the error
-    private String cameraLastFrameName;
-    private StampedDetectedObjects lastCamerasFrame; //The last frame detected by Camera
-    private String lidarLastFrameName;
-    private StampedCloudPoints lastLiDarWorkerTrackersFrame; //the last frame detected by Lidar
+    private  ConcurrentHashMap<String, StampedDetectedObjects> lastFramesCameras;
+    private  ConcurrentHashMap<String, List<TrackedObject>> lastFramesLiDars;
     private Pose[]poses;
 
     // Constructor to initialize all fields
     public ErrorOutput() {
         this.error = "";
         this.faultySensor = "";
-        this.cameraLastFrameName = "";
-        this.lastCamerasFrame = null;
-        this.lidarLastFrameName = "";
-       this.lastLiDarWorkerTrackersFrame = new StampedCloudPoints();
+        this.lastFramesCameras = new ConcurrentHashMap<String, StampedDetectedObjects>();
+        this.lastFramesLiDars = new ConcurrentHashMap<String, List<TrackedObject>>();
        this.poses = null;
     }
 
@@ -48,38 +46,9 @@ public class ErrorOutput {
         this.faultySensor = faultySensor;
     }
 
-    public String getCameraLastFrameName() {
-        return cameraLastFrameName;
+    public void addCameraFrame (String name,StampedDetectedObjects object){
+        this.lastFramesCameras.put(name, object);
     }
-
-    public void setCameraLastFrameName(String cameraLastFrameName) {
-        this.cameraLastFrameName = cameraLastFrameName;
-    }
-
-    public StampedDetectedObjects getLastCamerasFrame() {
-        return lastCamerasFrame;
-    }
-
-    public void setLastCamerasFrame(StampedDetectedObjects lastCamerasFrame) {
-        this.lastCamerasFrame = lastCamerasFrame;
-    }
-
-    public String getLidarLastFrameName() {
-        return lidarLastFrameName;
-    }
-
-    public void setLidarLastFrameName(String lidarLastFrameName) {
-        this.lidarLastFrameName = lidarLastFrameName;
-    }
-
-    public StampedCloudPoints getLastLiDarWorkerTrackersFrame() {
-        return lastLiDarWorkerTrackersFrame;
-    }
-
-    public void setLastLiDarWorkerTrackersFrame(StampedCloudPoints lastLiDarWorkerTrackersFrame) {
-        this.lastLiDarWorkerTrackersFrame = lastLiDarWorkerTrackersFrame;
-    }
-
     public Pose[] getPoses() {
         return poses;
     }
