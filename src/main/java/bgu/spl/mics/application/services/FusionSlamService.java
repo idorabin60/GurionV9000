@@ -20,13 +20,14 @@ public class FusionSlamService extends MicroService {
     private AtomicInteger numsOfCameras;
     private AtomicInteger numsOfLiDars;
     private AtomicInteger numsOfMainService; //the shelter of TimeService and PoseService
-
+    private boolean thereIsError;
     public FusionSlamService(FusionSlam fusionSlam,int numberOfCameras, int numberOfLiDars) {
         super("FusionSlam");
         this.fusionSlam=fusionSlam.getInstance();
         this.numsOfLiDars =  new AtomicInteger(numberOfLiDars);
         this.numsOfCameras= new AtomicInteger(numberOfCameras);
         this.numsOfMainService = new AtomicInteger(2);
+        thereIsError = false;
     }
 
     /**
