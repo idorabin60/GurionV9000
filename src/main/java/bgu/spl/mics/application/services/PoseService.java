@@ -60,7 +60,7 @@ public class PoseService extends MicroService {
 
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
-            if (termBrocast.getSender().equals("TimeService")) {
+            if (termBrocast.getSender().equals("TimeService")||termBrocast.getSender().equals("FusionSlamService")) {
                 gpsimu.setStatus(STATUS.DOWN);
                 sendBroadcast(new TerminatedBroadcast(("PoseService")));
                 terminate();
