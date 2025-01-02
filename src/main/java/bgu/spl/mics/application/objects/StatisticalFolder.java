@@ -10,10 +10,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class StatisticalFolder {
         // Fields
+    //update - runtime and tracked not atomic
         private AtomicInteger systemRuntime;       // The total runtime of the system, measured in ticks
         private AtomicInteger numDetectedObjects; // The cumulative count of objects detected by cameras
         private AtomicInteger numTrackedObjects;  // The cumulative count of objects tracked by LiDAR workers
-        private AtomicInteger numLandmarks;       // The total number of unique landmarks identified
+        private int numLandmarks;       // The total number of unique landmarks identified
     // Singleton pattern
     private static class SingletonHolder {
         private static final StatisticalFolder instance = new StatisticalFolder();
@@ -28,7 +29,7 @@ public class StatisticalFolder {
         this.systemRuntime = new AtomicInteger(0);
         this.numDetectedObjects = new AtomicInteger(0);
         this.numTrackedObjects = new AtomicInteger(0);
-        this.numLandmarks = new AtomicInteger(0);
+        this.numLandmarks = 0;
     }
 
     // Methods to update metrics
@@ -56,14 +57,10 @@ public class StatisticalFolder {
     public void incrementTrackedObjects(int count) {
         numTrackedObjects.addAndGet(count);
     }
-
-    /**
-     * Updates the number of landmarks if new ones are added.
-     * @param count The number of new landmarks to add.
-     */
-    public void incrementLandmarks(int count) {
-        numLandmarks.addAndGet(count);
+    public void setNumLandmarks(int landmarks) {
+        this.numLandmarks = landmarks;
     }
+
 
     // Getters
 
@@ -79,9 +76,6 @@ public class StatisticalFolder {
         return numTrackedObjects.get();
     }
 
-    public int getNumLandmarks() {
-        return numLandmarks.get();
-    }
 
     @Override
     public String toString() {
