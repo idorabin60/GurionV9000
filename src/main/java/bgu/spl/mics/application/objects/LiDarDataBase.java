@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * LiDarDataBase is a singleton class responsible for managing LiDAR data.
@@ -15,6 +16,7 @@ import java.util.List;
  */
 public class LiDarDataBase {
     private List<StampedCloudPoints> cloudPoints;
+    private AtomicInteger counterOfTrackedCloudPoints = new AtomicInteger(0);
 
     // Private constructor to prevent instantiation
     private LiDarDataBase(String lidarDataPath) {
@@ -75,5 +77,11 @@ public class LiDarDataBase {
     public boolean hasData(String objectId, int time) {
         return cloudPoints.stream()
                 .anyMatch(entry -> entry.getId().equals(objectId) && entry.getTime() == time);
+    }
+    public void  setCounterOfTrackedCloudPoints(int counterOfTrackedCloudPoints) {
+        this.counterOfTrackedCloudPoints.set(counterOfTrackedCloudPoints);
+    }
+    public AtomicInteger getCounterOfTrackedCloudPoints() {
+        return counterOfTrackedCloudPoints;
     }
 }
