@@ -105,6 +105,7 @@ public class LiDarWorkerTracker {
 
         if (!trackedObjects.isEmpty()) {
             trackedObjectsEventList.add(new TrackedObjectsEvent(trackedObjects));
+            setLastTrackedObjects(trackedObjects);
             System.out.println("Added TrackedObjectsEvent with " + trackedObjects.size() + " objects to the list.");
         }
     }
@@ -112,6 +113,7 @@ public class LiDarWorkerTracker {
     public List<TrackedObjectsEvent> getTrackedObjectsEventList() {
         return trackedObjectsEventList;
     }
+
 
     @Override
     public String toString() {

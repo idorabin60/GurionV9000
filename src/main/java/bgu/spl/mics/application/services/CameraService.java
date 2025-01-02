@@ -23,6 +23,7 @@ public class CameraService extends MicroService {
     private int currentTick;
 
 
+
     /**
      * Constructor for CameraService.
      *
