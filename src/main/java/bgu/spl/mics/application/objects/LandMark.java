@@ -31,4 +31,21 @@ public class LandMark {
     public void setCoordinates(ArrayList<CloudPoint> coordinates) {
         this.coordinates = coordinates;
     }
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("LandMark { ")
+                .append("id='").append(id).append('\'')
+                .append(", description='").append(description).append('\'')
+                .append(", coordinates=[");
+
+        for (int i = 0; i < coordinates.size(); i++) {
+            sb.append(coordinates.get(i).toString());
+            if (i < coordinates.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("] }");
+
+        return sb.toString();
+    }
 }

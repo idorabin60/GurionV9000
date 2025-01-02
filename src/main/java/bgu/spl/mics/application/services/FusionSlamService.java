@@ -19,12 +19,14 @@ public class FusionSlamService extends MicroService {
     private FusionSlam fusionSlam;
     private AtomicInteger numsOfCameras;
     private AtomicInteger numsOfLiDars;
+    private AtomicInteger numsOfMainService; //the shelter of TimeService and PoseService
 
     public FusionSlamService(FusionSlam fusionSlam,int numberOfCameras, int numberOfLiDars) {
         super("FusionSlam");
         this.fusionSlam=fusionSlam.getInstance();
         this.numsOfLiDars =  new AtomicInteger(numberOfLiDars);
         this.numsOfCameras= new AtomicInteger(numberOfCameras);
+        this.numsOfMainService = new AtomicInteger(2);
     }
 
     /**
@@ -60,6 +62,7 @@ public class FusionSlamService extends MicroService {
         });
 
         this.subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
+            //ASK IDO
             if (numsOfCameras.get()<=0 || numsOfLiDars.get()<=0 ){
                 sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
             }
@@ -70,25 +73,26 @@ public class FusionSlamService extends MicroService {
 
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
+            System.out.println(termBrocast.getSender());
             boolean isEmptyCamerasAndLidars= (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 );
-            if (termBrocast.getSender().equals("TimeService") && isEmptyCamerasAndLidars) {
+             if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("PoseService") ) {
+                this.numsOfMainService.addAndGet(-1);
+            }
+             else if (termBrocast.getSender().equals("CameraService")) {
+                 numsOfCameras.addAndGet(-1);
+             }
+             else if (termBrocast.getSender().equals("LiDarService")){
+                 numsOfLiDars.addAndGet(-1);
+             }
+
+             if (isEmptyCamerasAndLidars && numsOfMainService.get()==0){
                 terminate();
                 ///AND PRINT THE OUTPUT
             }
-            else if (termBrocast.getSender().equals("Camera")) {
-                numsOfCameras.addAndGet(-1);
-                if (isEmptyCamerasAndLidars){
-                    terminate();
-                    ///AND PRINT THE OUTPUT
-                }
+            else {
+                sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
             }
-            else if (termBrocast.getSender().equals("LiDar")){
-                numsOfLiDars.addAndGet(-1);
-                if (isEmptyCamerasAndLidars){
-                    terminate();
-                    ///AND PRINT THE OUTPUT
-                }
-            }
+
         });
 
         // Subscribe to crashedBroadcast

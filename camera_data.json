@@ -68,15 +68,5 @@
                 {"id": "Circular_Base_1", "description": "Circular Base"}
             ]
         }
-    ],
-    "camera2": [
-        {
-            "time": 20,
-            "detectedObjects": [
-                {"id": "Circular_Base_1", "description": "Circular Base"}
-            ]
-        }
-
-
     ]
 }

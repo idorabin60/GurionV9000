@@ -31,7 +31,6 @@ public class MessageBusImpl implements MessageBus {
 
     @Override
     public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-
             eventSubscriptions.computeIfAbsent(type, key -> new LinkedBlockingQueue<>()).add(m);
     }
 
@@ -70,7 +69,7 @@ public class MessageBusImpl implements MessageBus {
 
     @Override
     public <T> Future<T> sendEvent(Event<T> e) {
-        lock.writeLock().lock();
+        lock.readLock().lock();
         try {
             LinkedBlockingQueue<MicroService> subscribers = eventSubscriptions.get(e.getClass());
             if (subscribers == null || subscribers.isEmpty()) {
@@ -88,7 +87,7 @@ public class MessageBusImpl implements MessageBus {
                 return future;
             }
         } finally {
-            lock.writeLock().unlock();
+            lock.readLock().unlock();
         }
         return null; // Return null if no subscriber was found
     }
