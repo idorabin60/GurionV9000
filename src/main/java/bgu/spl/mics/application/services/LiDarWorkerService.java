@@ -37,21 +37,20 @@ public class LiDarWorkerService extends MicroService {
                 lidarTracker.getReadyEvents().forEach(event -> {
                     event.getTrackedObjects().forEach(trackedObject -> {
                         if (trackedObject.getId().equals("ERROR")){
-                            ErrorOutput.getInstance().setError(trackedObject.getDescription());
+                            System.out.println(getName() + " ERROR IN LIDAR " + tick.getCurrentTick());
+                            ErrorOutput.getInstance().setError("Connection to LiDAR lost");
                             ErrorOutput.getInstance().setFaultySensor(this.getName());
                             ErrorOutput.getInstance().addLiDarFrame(this.getName(),this.lidarTracker.getLastTrackedObjects());
                             sendBroadcast(new CrashedBroadcast("LiDarService"));
                             lidarTracker.setStatus(STATUS.ERROR);
                             terminate();
-
-//                            ErrorOutput.getInstance().
+                            //BREAKKKKKKKKKKKKKKKKK
                         }else {
                             lidarTracker.getLastTrackedObjects().add(trackedObject);
                         }
                     });
                     sendEvent(event);
                     int numberOfTrackedObjectsInEvent = event.getTrackedObjects().size();
-
                     // Atomically decrement the counter
                     LiDarDataBase dbInstance = LiDarDataBase.getInstance();
                     dbInstance.setCounterOfTrackedCloudPoints(dbInstance.getCounterOfTrackedCloudPoints().get() - numberOfTrackedObjectsInEvent);

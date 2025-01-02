@@ -57,7 +57,6 @@ public class CameraService extends MicroService {
                 StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick - camera.getFrequency());
                 if (objectsAtTimeT == null) {
                     /// DELETE THIS PRINT
-                //ASK IDO IF IT OKAY RETURN
                     System.out.println(getName() + " found no detected objects at tick " + currentTick);
                     return; // Skip further processing
                 }
@@ -73,7 +72,7 @@ public class CameraService extends MicroService {
                         ErrorOutput.getInstance().addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
                         sendBroadcast(new CrashedBroadcast("CameraService"));
                         terminate();
-                        break;
+                       return;
                     }
                 }
                 //there is no error
