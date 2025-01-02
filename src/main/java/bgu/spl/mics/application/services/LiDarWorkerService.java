@@ -46,14 +46,14 @@ public class LiDarWorkerService extends MicroService {
 
                         }else {
                             lidarTracker.getLastTrackedObjects().add(trackedObject);
-                            sendEvent(event);
-                            int numberOfTrackedObjectsInEvent = event.getTrackedObjects().size();
-                            LiDarDataBase dbInstance = LiDarDataBase.getInstance();
-                            dbInstance.setCounterOfTrackedCloudPoints(dbInstance.getCounterOfTrackedCloudPoints().get() - numberOfTrackedObjectsInEvent);
-
-                            System.out.println(getName() + " sent TrackedObjectsEvent at tick " + tick.getCurrentTick());
                         }
                     });
+                    sendEvent(event);
+                    int numberOfTrackedObjectsInEvent = event.getTrackedObjects().size();
+                    LiDarDataBase dbInstance = LiDarDataBase.getInstance();
+                    dbInstance.setCounterOfTrackedCloudPoints(dbInstance.getCounterOfTrackedCloudPoints().get() - numberOfTrackedObjectsInEvent);
+                    System.out.println(getName() + " sent TrackedObjectsEvent at tick " + tick.getCurrentTick());
+
 
                 });
 
