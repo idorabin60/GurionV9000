@@ -20,13 +20,14 @@ public class FusionSlamService extends MicroService {
     private AtomicInteger numsOfCameras;
     private AtomicInteger numsOfLiDars;
     private AtomicInteger numsOfMainService; //the shelter of TimeService and PoseService
-
+    private boolean thereIsError;
     public FusionSlamService(FusionSlam fusionSlam,int numberOfCameras, int numberOfLiDars) {
         super("FusionSlam");
         this.fusionSlam=fusionSlam.getInstance();
         this.numsOfLiDars =  new AtomicInteger(numberOfLiDars);
         this.numsOfCameras= new AtomicInteger(numberOfCameras);
         this.numsOfMainService = new AtomicInteger(2);
+        thereIsError = false;
     }
 
     /**
@@ -88,7 +89,7 @@ public class FusionSlamService extends MicroService {
                 terminate();
                 ///AND PRINT THE OUTPUT
             }
-            else {
+            else if (isEmptyCamerasAndLidars && numsOfMainService.get()>0){
                 sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
             }
 
@@ -96,6 +97,8 @@ public class FusionSlamService extends MicroService {
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
+            // ido
+            this.thereIsError = true;
             // not to do anything because it will end in the terminate Broadcast
         });
         SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
