@@ -33,7 +33,11 @@ public class GPSIMU {
         this.status = status;
     }
 
-    public ArrayList<Pose> getPoseList() {
+    public ArrayList<Pose> getPoseListByTime(int time) {
+        return new ArrayList<>(PoseList.subList(0, time));
+    }
+
+    public ArrayList<Pose> getPoseList(){
         return PoseList;
     }
 
