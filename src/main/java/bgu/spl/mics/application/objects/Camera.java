@@ -58,6 +58,11 @@ public class Camera {
         return detectedObjectsList;
     }
 
+    /* @inv: detectedObjectsList.size() remains constant.
+       @pre: detectedObjectsList is initialized and not null.
+       @post: If exists detectedObject in detectedObjectsList such that detectedObject.getTime() == timeT, then return detectedObject.
+       other, if time is invaild or there is no data for this time, return null.
+     */
     public StampedDetectedObjects getDetectedObjectAtTimeT(int timeT) {
         if (timeT < 0) {
             return null;
