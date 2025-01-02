@@ -96,7 +96,12 @@ public class FusionSlamService extends MicroService {
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
-            // not to do anything because it will end in the terminate Broadcast
+             if (terminate.getSender().equals("CameraService")) {
+                numsOfCameras.addAndGet(-1);
+            }
+            else {
+                numsOfLiDars.addAndGet(-1);
+            }
         });
         SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
 
