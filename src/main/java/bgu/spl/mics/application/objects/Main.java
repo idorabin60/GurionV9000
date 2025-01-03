@@ -107,6 +107,7 @@ public class Main {
             FusionSlam.getInstance().getLandmarks().forEach(landmark -> {
                 System.out.println(landmark.toString());
             });
+            System.out.println("Statistical folder data: " + StatisticalFolder.getInstance().toString());
 
 
         } catch (IOException e) {
