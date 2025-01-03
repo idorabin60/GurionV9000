@@ -92,6 +92,9 @@ public class FusionSlamService extends MicroService {
                     StatisticalFolder.getInstance().setNumLandmarks(fusionSlam.getLandmarks().size());
                 }
                 System.out.println(StatisticalFolder.getInstance().toString());
+                if (thereIsError){
+                    System.out.println("THE SENSOR OF ERROR:" + ErrorOutput.getInstance().getFaultySensor() + " THE ERROR: " + ErrorOutput.getInstance().getError());
+                }
                 terminate();
             }
             else {
@@ -108,6 +111,7 @@ public class FusionSlamService extends MicroService {
 
         // Subscribe to crashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, terminate -> {
+            thereIsError=true;
              if (terminate.getSender().equals("CameraService")) {
                 numsOfCameras.addAndGet(-1);
             }
