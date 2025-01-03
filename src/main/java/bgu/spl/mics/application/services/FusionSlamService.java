@@ -88,7 +88,9 @@ public class FusionSlamService extends MicroService {
              }
             boolean isEmptyCamerasAndLidars= (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 );
             if (isEmptyCamerasAndLidars && numsOfMainService.get()==0){
-                StatisticalFolder.getInstance().setNumLandmarks(fusionSlam.getLandmarks().size());
+                if (!fusionSlam.getLandmarks().isEmpty()) {
+                    StatisticalFolder.getInstance().setNumLandmarks(fusionSlam.getLandmarks().size());
+                }
                 System.out.println(StatisticalFolder.getInstance().toString());
                 terminate();
             }
