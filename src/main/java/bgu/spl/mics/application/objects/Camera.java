@@ -1,5 +1,7 @@
 package bgu.spl.mics.application.objects;
 
+import bgu.spl.mics.application.messages.CrashedBroadcast;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +91,16 @@ public class Camera {
         }
         this.detectedObjectsList = newDetectedObjects;
         this.lifeCycle = newDetectedObjects.size();
+    }
+
+    public boolean hasError(List<DetectedObject> objects){
+        for (DetectedObject obj : objects) {
+            if (obj.getId().equals("ERROR")) {
+                ErrorOutput.getInstance().setError(obj.getDescription());
+                return true;
+            }
+            }
+        return false;
     }
     @Override
     public String toString() {
