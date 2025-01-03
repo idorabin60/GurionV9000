@@ -85,7 +85,7 @@ public class CameraService extends MicroService {
                     //decrease camera life cycle
                     camera.setLifeCycle(camera.getLifeCycle() - 1);
                     camera.setLastStampedDetectedObjects(objectsAtTimeT);
-                    System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId());
+                    System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId() +"sum:" + objectsAtTimeT.getDetectedObjects().size());
                     //update the statistical folder
                     StatisticalFolder.getInstance().incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
                     // Send DetectObjectsEvent

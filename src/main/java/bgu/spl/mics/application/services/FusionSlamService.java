@@ -42,6 +42,7 @@ public class FusionSlamService extends MicroService {
         //Handle TrackedObjectsEvent
         subscribeEvent(TrackedObjectsEvent.class, (TrackedObjectsEvent event) -> {
             List<TrackedObject> trackedObjects = event.getTrackedObjects();
+            StatisticalFolder.getInstance().incrementTrackedObjects(trackedObjects.size());
             for (TrackedObject object : trackedObjects){
                 //convert coordinates to global
                 if ( fusionSlam.getPose(object.getTime())!=null) {
@@ -88,8 +89,9 @@ public class FusionSlamService extends MicroService {
              }
             boolean isEmptyCamerasAndLidars= (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 );
             if (isEmptyCamerasAndLidars && numsOfMainService.get()==0){
+                StatisticalFolder.getInstance().setNumLandmarks(fusionSlam.getLandmarks().size());
+                System.out.println(StatisticalFolder.getInstance().toString());
                 terminate();
-                ///AND PRINT THE OUTPUT
             }
             else {
                 try {
