@@ -96,7 +96,10 @@ public class Camera {
     public boolean hasError(List<DetectedObject> objects){
         for (DetectedObject obj : objects) {
             if (obj.getId().equals("ERROR")) {
-                ErrorOutput.getInstance().setError(obj.getDescription());
+                if (obj.getDescription()==null)
+                    ErrorOutput.getInstance().setError("Camera disconnected");
+                else
+                    ErrorOutput.getInstance().setError(obj.getDescription());
                 return true;
             }
             }
