@@ -60,4 +60,5 @@ public class ErrorOutput {
     public ArrayList<Pose> getPoses() {
         return poses;
     }
+
 }
