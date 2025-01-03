@@ -50,7 +50,6 @@ public class FusionSlamService extends MicroService {
                     LandMark landMarkIsExists = fusionSlam.getLankMark(object.getId());
                     if (landMarkIsExists == null) { //A new lankMark
                         fusionSlam.addLankMark(new LandMark(object.getId(), object.getDescription(), object.getCoordinates()));
-                        StatisticalFolder.getInstance().incrementDetectedObjects(1);
                     } else { //Need to update coordinates
                         fusionSlam.updateLandmarkCoordinates(landMarkIsExists, object);
                     }
