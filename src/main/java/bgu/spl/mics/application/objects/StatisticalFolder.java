@@ -60,6 +60,9 @@ public class StatisticalFolder {
     public void setNumLandmarks(int landmarks) {
         this.numLandmarks = landmarks;
     }
+    public int getNumLandmarks() {
+        return this.numLandmarks;
+    }
 
 
     // Getters
