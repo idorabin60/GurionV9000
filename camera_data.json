@@ -1,20 +1,20 @@
 {
     "camera1":[
         {
-            "time": 2,
+            "time": 1,
             "detectedObjects": [
                 {"id": "Wall_1", "description": "Wall"}
             ]
         },
         {
-            "time": 4,
+            "time": 2,
             "detectedObjects": [
                 {"id": "Wall_3", "description": "Wall"},
                 {"id": "Chair_Base_1", "description": "Chair Base"}
             ]
         },
         {
-            "time": 6,
+            "time": 3,
             "detectedObjects": [
                 {"id": "Wall_4", "description": "Wall"},
                 {"id": "Circular_Base_1", "description": "Circular Base"}
