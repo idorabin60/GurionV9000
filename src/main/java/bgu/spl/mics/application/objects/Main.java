@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -107,6 +108,10 @@ public class Main {
             FusionSlam.getInstance().getLandmarks().forEach(landmark -> {
                 System.out.println(landmark.toString());
             });
+            System.out.println("Statistical folder data: " + StatisticalFolder.getInstance().toString());
+            createOutputJsonFile(fusionSlam, StatisticalFolder.getInstance());
+            System.out.println("Output JSON file created: ido_rabin_output_data.json");
+
 
 
         } catch (IOException e) {
@@ -165,5 +170,38 @@ public class Main {
         System.err.println(message + ": " + e.getMessage());
         e.printStackTrace();
     }
+    private static void createOutputJsonFile(FusionSlam fusionSlam, StatisticalFolder statisticalFolder) throws IOException {
+        Gson gson = new Gson();
+        JsonObject outputJson = new JsonObject();
+
+        outputJson.addProperty("systemRuntime", statisticalFolder.getSystemRuntime());
+        outputJson.addProperty("numDetectedObjects", statisticalFolder.getNumDetectedObjects());
+        outputJson.addProperty("numTrackedObjects", statisticalFolder.getNumTrackedObjects());
+        outputJson.addProperty("numLandmarks", statisticalFolder.getNumLandmarks());
+
+        JsonObject landmarksJson = new JsonObject();
+        fusionSlam.getLandmarks().forEach(landmark -> {
+            JsonObject landmarkJson = new JsonObject();
+            landmarkJson.addProperty("id", landmark.getId());
+            landmarkJson.addProperty("description", landmark.getDescription());
+
+            List<JsonObject> coordinates = new ArrayList<>();
+            landmark.getCoordinates().forEach(coord -> {
+                JsonObject coordinate = new JsonObject();
+                coordinate.addProperty("x", coord.getX());
+                coordinate.addProperty("y", coord.getY());
+                coordinates.add(coordinate);
+            });
+            Type listType = new TypeToken<List<JsonObject>>() {}.getType();
+            landmarkJson.add("coordinates", gson.toJsonTree(coordinates, listType));
+            landmarksJson.add(landmark.getId(), landmarkJson);
+        });
+        outputJson.add("landMarks", landmarksJson);
+
+        try (FileWriter writer = new FileWriter("ido_rabin_output_data.json")) {
+            gson.toJson(outputJson, writer);
+        }
+    }
+
 
 }//bla:
