@@ -46,6 +46,8 @@ public class TimeService extends MicroService {
                     Thread.sleep(tickInterval * 1000);
                     currentTick++;
                     sendBroadcast(new TickBroadcast(currentTick));
+                    System.out.println("going to send a tick: " + currentTick);
+
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
