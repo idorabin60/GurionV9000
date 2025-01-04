@@ -150,7 +150,7 @@ public class Main {
             LiDarWorkerTracker worker = new LiDarWorkerTracker(id, frequency);
             lidarWorkers.add(worker);
 
-        }
+        }//
     }
 
     private static List<Camera> initializeCameras(String configFilePath) {
