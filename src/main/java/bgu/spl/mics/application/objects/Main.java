@@ -25,7 +25,7 @@ public class Main {
             int tickTime = config.get("TickTime").getAsInt();
             int duration = config.get("Duration").getAsInt();
             System.out.println("TickTime: " + tickTime);
-            String lidarDataPath = config.getAsJsonObject("LidarWorkers").get("lidars_data_path").getAsString();
+            String lidarDataPath = config.getAsJsonObject("LiDarWorkers").get("lidars_data_path").getAsString();
             System.out.println("Attempting to load LiDAR data from: " + lidarDataPath);
 
             //init Lidar DB
@@ -138,7 +138,7 @@ public class Main {
         Gson gson = new Gson();
         Type lidarConfigListType = new TypeToken<List<JsonObject>>() {
         }.getType();
-        return gson.fromJson(config.getAsJsonObject("LidarWorkers").get("LidarConfigurations"), lidarConfigListType);
+        return gson.fromJson(config.getAsJsonObject("LiDarWorkers").get("LidarConfigurations"), lidarConfigListType);
     }
 
     private static void initializeLidarWorkers(List<JsonObject> lidarConfigs) {
