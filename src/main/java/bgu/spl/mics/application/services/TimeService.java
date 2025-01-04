@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
@@ -45,7 +46,12 @@ public class TimeService extends MicroService {
                 try {
                     Thread.sleep(tickInterval * 1000);
                     currentTick++;
-                    sendBroadcast(new TickBroadcast(currentTick));
+                    if(!MessageBusImpl.getInstance().getIsError()){
+                        sendBroadcast(new TickBroadcast(currentTick));
+                        System.out.println("going to send a tick: " + currentTick);
+                    }
+
+
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
