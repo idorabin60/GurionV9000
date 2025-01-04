@@ -58,7 +58,7 @@ public class StatisticalFolder {
         numTrackedObjects.addAndGet(count);
     }
     public void setNumLandmarks(int landmarks) {
-        this.numLandmarks.addAndGet(landmarks);
+        numLandmarks.addAndGet(landmarks);
     }
 
 
