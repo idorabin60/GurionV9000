@@ -43,7 +43,6 @@ public class CameraService extends MicroService {
     protected void initialize() {
         System.out.println(getName() + " for camera " + camera.getId() + " started");
         camera.setStatus(STATUS.UP);
-        AtomicBoolean isError = new AtomicBoolean(false);
 
         // Subscribe to TickBroadcast
         subscribeBroadcast(TickBroadcast.class, (TickBroadcast tick) -> {
@@ -57,30 +56,23 @@ public class CameraService extends MicroService {
                 StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick - camera.getFrequency());
                 if (objectsAtTimeT == null) {
                     /// DELETE THIS PRINT
-                //ASK IDO IF IT OKAY RETURN
                     System.out.println(getName() + " found no detected objects at tick " + currentTick);
                     return; // Skip further processing
                 }
                 //iterate all the objects and see if there is an object of id:ERROR
-                //DO EXTERNAL ERROR
                 List<DetectedObject> objects = objectsAtTimeT.getDetectedObjects();
-                for (DetectedObject obj : objects) {
-                    if (obj.getId().equals("ERROR")) {
-                        System.out.println(this.currentTick +"tick of the Error");
-                        System.out.println("FOUND AN ERRO CRASH THE SYSTEM");
-                        camera.setStatus(STATUS.ERROR);
-                        //send crashed Broadcast
-                        ErrorOutput.getInstance().setError(obj.getDescription());
-                        ErrorOutput.getInstance().setFaultySensor(this.getName());
-                        ErrorOutput.getInstance().addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
-                        sendBroadcast(new CrashedBroadcast("CameraService"));
-                        isError.set(true);
-                        terminate();
-
-
-                    }
+                if (camera.hasError(objects)){
+                    System.out.println(this.currentTick +"tick of the Error");
+                    System.out.println("FOUND AN ERRO CRASH THE SYSTEM");
+                    camera.setStatus(STATUS.ERROR);
+                    //Update the statistical Folder
+                    ErrorOutput.getInstance().setFaultySensor(this.getName());
+                    ErrorOutput.getInstance().addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
+                    //send crashed Broadcast
+                    sendBroadcast(new CrashedBroadcast("CameraService"));
+                    terminate();
                 }
-                if (isError.get()==false) {
+                else {
                     //there is no error
                     //decrease camera life cycle
                     camera.setLifeCycle(camera.getLifeCycle() - 1);

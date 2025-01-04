@@ -14,7 +14,7 @@ public class StatisticalFolder {
         private AtomicInteger systemRuntime;       // The total runtime of the system, measured in ticks
         private AtomicInteger numDetectedObjects; // The cumulative count of objects detected by cameras
         private AtomicInteger numTrackedObjects;  // The cumulative count of objects tracked by LiDAR workers
-        private int numLandmarks;       // The total number of unique landmarks identified
+        private AtomicInteger numLandmarks;       // The total number of unique landmarks identified
     // Singleton pattern
     private static class SingletonHolder {
         private static final StatisticalFolder instance = new StatisticalFolder();
@@ -29,7 +29,7 @@ public class StatisticalFolder {
         this.systemRuntime = new AtomicInteger(0);
         this.numDetectedObjects = new AtomicInteger(0);
         this.numTrackedObjects = new AtomicInteger(0);
-        this.numLandmarks = 0;
+        this.numLandmarks = new AtomicInteger(0);
     }
 
     // Methods to update metrics
@@ -58,10 +58,10 @@ public class StatisticalFolder {
         numTrackedObjects.addAndGet(count);
     }
     public void setNumLandmarks(int landmarks) {
-        this.numLandmarks = landmarks;
+        numLandmarks.addAndGet(landmarks);
     }
-    public int getNumLandmarks() {
-        return this.numLandmarks;
+    public AtomicInteger getNumLandmarks() {
+        return numLandmarks;
     }
 
 
