@@ -71,6 +71,7 @@ public class LiDarWorkerService extends MicroService {
             lidarTracker.setStatus(STATUS.DOWN);
             sendBroadcast(new TerminatedBroadcast(("LiDarService")));
             System.out.println("LastTrackedObjectsList = "+lidarTracker.getLastTrackedObjects());
+            ErrorOutput.getInstance().addLiDarFrame(this.getName(),this.lidarTracker.getLastTrackedObjects());
             terminate();
         });
 
@@ -80,7 +81,6 @@ public class LiDarWorkerService extends MicroService {
                 lidarTracker.setStatus(STATUS.DOWN);
                 sendBroadcast(new TerminatedBroadcast(("LiDarService")));
                 System.out.println("LastTrackedObjectsList = "+lidarTracker.getLastTrackedObjects());
-
                 terminate();
             }
         });

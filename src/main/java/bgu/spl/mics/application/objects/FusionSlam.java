@@ -12,13 +12,16 @@ import java.util.ArrayList;
 public class FusionSlam {
     // Fields
     private ArrayList<LandMark> landmarks; // Represents the map of the environment
-    private ArrayList<Pose> poses;     // Represents previous poses needed for calculations
+    private ArrayList<Pose> poses;
+    private boolean thereIsError;// Represents previous poses needed for calculations
 
 
     // Constructor
     public FusionSlam() {
         landmarks = new ArrayList<LandMark>();
         poses = new ArrayList<Pose>();
+        thereIsError = false;
+
     }
 
     //Singleton
@@ -101,6 +104,12 @@ public class FusionSlam {
     }
     public List<LandMark> getLandmarks() {
         return landmarks;
+    }
+    public void setThereIsError(boolean thereIsError) {
+        this.thereIsError = thereIsError;
+    }
+    public boolean isThereIsError() {
+        return thereIsError;
     }
 
 }

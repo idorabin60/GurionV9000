@@ -105,12 +105,15 @@ public class Main {
                 }
             }
             System.out.println("finisheddd");
-            FusionSlam.getInstance().getLandmarks().forEach(landmark -> {
-                System.out.println(landmark.toString());
-            });
-            System.out.println("Statistical folder data: " + StatisticalFolder.getInstance().toString());
-            createOutputJsonFile(fusionSlam, StatisticalFolder.getInstance());
-            System.out.println("Output JSON file created: ido_rabin_output_data.json");
+
+            if (FusionSlam.getInstance().isThereIsError()){
+                ErrorOutput.getInstance().createErrorOutputFile();
+            }
+            else {
+                createOutputJsonFile(fusionSlam, StatisticalFolder.getInstance());
+                System.out.println("Output JSON file created: ido_rabin_output_data.json");
+            }
+
 
 
 
