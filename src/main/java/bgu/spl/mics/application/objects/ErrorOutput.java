@@ -71,6 +71,8 @@ public class ErrorOutput {
     }
 
     public void createErrorOutputFile() {
+        System.out.println("Creating error output file LOOOOOKKK HEEEEREEE IDDOOO" );
+        System.out.println(this.lastFramesLiDars.toString());
         Gson gson = new Gson();
         String filePath = "ido_rabin_error.json";
 
