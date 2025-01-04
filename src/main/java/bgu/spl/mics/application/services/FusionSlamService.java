@@ -93,6 +93,7 @@ public class FusionSlamService extends MicroService {
                 }
                 System.out.println(StatisticalFolder.getInstance().toString());
                 if (thereIsError){
+                    FusionSlam.getInstance().setThereIsError(true);
                     System.out.println("THE SENSOR OF ERROR:" + ErrorOutput.getInstance().getFaultySensor() + " THE ERROR: " + ErrorOutput.getInstance().getError());
                 }
                 terminate();
