@@ -10,12 +10,14 @@ public class MessageBusImpl implements MessageBus {
     private final ConcurrentHashMap<Event<?>, Future<?>> eventFutureMap;
     private static volatile MessageBusImpl instance; // Ensure volatile for thread-safe double-checked locking
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private volatile boolean isError;
 
     private MessageBusImpl() {
         microServiceMessageQueue = new ConcurrentHashMap<>();
         broadcastSubscriptions = new ConcurrentHashMap<>();
         eventSubscriptions = new ConcurrentHashMap<>();
         eventFutureMap = new ConcurrentHashMap<>();
+        isError = false;
     }
 
     public static MessageBusImpl getInstance() {
@@ -121,4 +123,11 @@ public class MessageBusImpl implements MessageBus {
         }
         return queue.take(); // Wait for the next message
     }
+    public boolean getIsError() {
+        return isError;
+    }
+    public void setIsError(boolean isError) {
+        this.isError = isError;
+    }
+
 }
