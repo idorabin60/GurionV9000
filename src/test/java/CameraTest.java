@@ -1,5 +1,6 @@
 import bgu.spl.mics.application.objects.Camera;
 import bgu.spl.mics.application.objects.CameraDataUpdater;
+import bgu.spl.mics.application.objects.DetectedObject;
 import bgu.spl.mics.application.objects.StampedDetectedObjects;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -32,6 +33,7 @@ public class CameraTest {
         }
     }
 
+    //Tests to the method: getDetectedObjectAtTimeT
     @Test
     void testGetDetectedObjectAtTimeT_ValidTime() {
         Camera camera = cameras.get(0);
@@ -59,8 +61,16 @@ public class CameraTest {
         assertEquals(1, result.getDetectedObjects().size(), "The number of detected objects should match");
         assertEquals("Wall_5", result.getDetectedObjects().get(0).getId(), "The first detected object's ID should match");
     }
+
+    //Test to the method: hasError
+    @Test
+    public void testHasErrorWithErrorObject() {
+        Camera camera = cameras.get(0);
+        int timeT = 1; // First time in the list (replace with your actual first time)
+        List<DetectedObject> temp = camera.getDetectedObjectAtTimeT(timeT).getDetectedObjects();
+        // Act
+        boolean result = camera.hasError(temp);
+        // Assert
+        assertTrue(result, "The method should return true when an object with id 'ERROR' is found.");
+    }
 }
-//blaa
-
-
-
