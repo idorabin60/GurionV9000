@@ -69,9 +69,7 @@ public class FusionSlamService extends MicroService {
             if (numsOfCameras.get()<=0 && numsOfLiDars.get()<=0 ){
                 sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
             }
-            else {
-                StatisticalFolder.getInstance().setSystemRuntime(tick.getCurrentTick());
-            }
+
         });
 
         //Subscribe to TerminateBroadcast

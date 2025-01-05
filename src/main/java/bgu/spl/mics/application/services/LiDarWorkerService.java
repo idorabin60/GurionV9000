@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.application.objects.*;
@@ -22,78 +23,29 @@ public class LiDarWorkerService extends MicroService {
 
         // Subscribe to DetectObjectsEvent
         subscribeEvent(DetectObjectsEvent.class, event -> {
+            System.out.println("Roooooooooooorsh hasha "+event.getDetectedObjects());
             System.out.println(getName() + " received DetectObjectsEvent at tick " + event.getTime());
             lidarTracker.addDetectedObjectsEvent(event);
-            complete(event, lidarTracker.getLastTrackedObjects());
+            processAndBroadcastEvents();
         });
 
         // Subscribe to TickBroadcast
         subscribeBroadcast(TickBroadcast.class, tick -> {
             if (LiDarDataBase.getInstance().getCounterOfTrackedCloudPoints().get() <= 0) {
-                System.out.println("FININSHED ALL OF THE LIDAR WORK" + LiDarDataBase.getInstance().getCounterOfTrackedCloudPoints().get());
+                System.out.println("FINISHED ALL OF THE LIDAR WORK");
                 System.out.println("LastTrackedObjectsList = " + lidarTracker.getLastTrackedObjects());
                 sendBroadcast(new TerminatedBroadcast("LiDarService"));
                 terminate();
             } else {
                 lidarTracker.updateCurrentTick(tick.getCurrentTick());
-                // Process events and send them directly from the microservice
-                lidarTracker.getReadyEvents().forEach(event -> {
-                    if (isErrorDetected) {
-                        return;
-                    }
-                    event.getTrackedObjects().forEach(trackedObject -> {
-                        if (trackedObject.getId().equals("ERROR")) {
-                            ErrorOutput.getInstance().setError("Connection to Lidar Failed");
-                            ErrorOutput.getInstance().setFaultySensor(this.getName());
-                            ErrorOutput.getInstance().addLiDarFrame(this.getName(), this.lidarTracker.getLastTrackedObjects());
-                            sendBroadcast(new CrashedBroadcast("LiDarService"));
-                            lidarTracker.setStatus(STATUS.ERROR);
-                            terminate();
-                            isErrorDetected = true;
-                        } else {
-                            lidarTracker.getLastTrackedObjects().clear();
-                            // Create a deep copy of trackedObject
-                            ArrayList<CloudPoint> copiedCoordinates = new ArrayList<>();
-                            for (CloudPoint point : trackedObject.getCoordinates()) {
-                                copiedCoordinates.add(new CloudPoint(point.getX(), point.getY()));
-                            }
-                            TrackedObject copiedObject = new TrackedObject(
-                                    trackedObject.getId(),
-                                    trackedObject.getTime(),
-                                    trackedObject.getDescription(),
-                                    copiedCoordinates
-                            );
-
-                            lidarTracker.getLastTrackedObjects().add(copiedObject);
-
-                            System.out.println("look here. ido");
-                            System.out.println(trackedObject.toString());
-                        }
-                    });
-                    if (!isErrorDetected) {
-                        sendEvent(event);
-                        int numberOfTrackedObjectsInEvent = event.getTrackedObjects().size();
-                        LiDarDataBase dbInstance = LiDarDataBase.getInstance();
-                        dbInstance.setCounterOfTrackedCloudPoints(dbInstance.getCounterOfTrackedCloudPoints().get() - numberOfTrackedObjectsInEvent);
-                        System.out.println(getName() + " sent TrackedObjectsEvent at tick " + tick.getCurrentTick());
-                    }
-
-
-                });
-
+                processAndBroadcastEvents();
             }
-
-
-        });
-        subscribeEvent(DetectObjectsEvent.class, event -> {
-            System.out.println(getName() + " received DetectObjectsEvent at tick " + event.getTime());
-            lidarTracker.addDetectedObjectsEvent(event);
         });
 
         // Subscribe to CrashedBroadcast
         subscribeBroadcast(CrashedBroadcast.class, broadcast -> {
             lidarTracker.setStatus(STATUS.DOWN);
-            sendBroadcast(new TerminatedBroadcast(("LiDarService")));
+            sendBroadcast(new TerminatedBroadcast("LiDarService"));
             System.out.println("LastTrackedObjectsList = " + lidarTracker.getLastTrackedObjects());
             ErrorOutput.getInstance().addLiDarFrame(this.getName(), this.lidarTracker.getLastTrackedObjects());
             terminate();
@@ -103,12 +55,62 @@ public class LiDarWorkerService extends MicroService {
         subscribeBroadcast(TerminatedBroadcast.class, broadcast -> {
             if (broadcast.getSender().equals("TimeService") || broadcast.getSender().equals("LiDarService")) {
                 lidarTracker.setStatus(STATUS.DOWN);
-                sendBroadcast(new TerminatedBroadcast(("LiDarService")));
+                sendBroadcast(new TerminatedBroadcast("LiDarService"));
                 System.out.println("LastTrackedObjectsList = " + lidarTracker.getLastTrackedObjects());
                 terminate();
             }
         });
-        SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
 
+        SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
+    }
+
+    private void processAndBroadcastEvents() {
+        System.out.println("Going to send evetns");
+        lidarTracker.getReadyEvents().forEach(event -> {
+            if (isErrorDetected) {
+                return;
+            }
+
+            event.getTrackedObjects().forEach(trackedObject -> {
+                System.out.println("tracked object idooooooo " + trackedObject);
+                if (trackedObject.getId().equals("ERROR")) {
+                    ErrorOutput.getInstance().setError(this.getName() + " disconnected");
+                    ErrorOutput.getInstance().setFaultySensor(this.getName());
+                    ErrorOutput.getInstance().addLiDarFrame(this.getName(), this.lidarTracker.getLastTrackedObjects());
+                    sendBroadcast(new CrashedBroadcast("LiDarService"));
+                    lidarTracker.setStatus(STATUS.ERROR);
+                    isErrorDetected = true;
+                    MessageBusImpl.getInstance().setIsError(true);
+                    terminate();
+                } else {
+                    lidarTracker.getLastTrackedObjects().clear();
+
+                    // Create a deep copy of trackedObject
+                    ArrayList<CloudPoint> copiedCoordinates = new ArrayList<>();
+                    for (CloudPoint point : trackedObject.getCoordinates()) {
+                        copiedCoordinates.add(new CloudPoint(point.getX(), point.getY()));
+                    }
+                    TrackedObject copiedObject = new TrackedObject(
+                            trackedObject.getId(),
+                            trackedObject.getTime(),
+                            trackedObject.getDescription(),
+                            copiedCoordinates
+                    );
+
+                    lidarTracker.getLastTrackedObjects().add(copiedObject);
+                    System.out.println("look here. ido");
+                    System.out.println(trackedObject.toString());
+                }
+            });
+
+            if (!isErrorDetected) {
+                sendEvent(event);
+                System.out.println("SENT EVENT AT TICK 111111111");
+                int numberOfTrackedObjectsInEvent = event.getTrackedObjects().size();
+                LiDarDataBase dbInstance = LiDarDataBase.getInstance();
+                dbInstance.setCounterOfTrackedCloudPoints(dbInstance.getCounterOfTrackedCloudPoints().get() - numberOfTrackedObjectsInEvent);
+                System.out.println(getName() + " processed and broadcasted events");
+            }
+        });
     }
 }
