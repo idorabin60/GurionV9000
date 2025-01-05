@@ -33,12 +33,12 @@ public class MessageBusImpl implements MessageBus {
 
     @Override
     public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-            eventSubscriptions.computeIfAbsent(type, key -> new LinkedBlockingQueue<>()).add(m);
+        eventSubscriptions.computeIfAbsent(type, key -> new LinkedBlockingQueue<>()).add(m);
     }
 
     @Override
     public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
-            broadcastSubscriptions.computeIfAbsent(type, key -> new CopyOnWriteArrayList<>()).add(m);
+        broadcastSubscriptions.computeIfAbsent(type, key -> new CopyOnWriteArrayList<>()).add(m);
 
 
     }
@@ -71,13 +71,22 @@ public class MessageBusImpl implements MessageBus {
 
     @Override
     public <T> Future<T> sendEvent(Event<T> e) {
+        LinkedBlockingQueue<MicroService> subscribers;
+
+        // Safely retrieve the subscribers for the event type
         lock.readLock().lock();
         try {
-            LinkedBlockingQueue<MicroService> subscribers = eventSubscriptions.get(e.getClass());
+            subscribers = eventSubscriptions.get(e.getClass());
             if (subscribers == null || subscribers.isEmpty()) {
                 return null; // No subscribers for this event
             }
-            MicroService m = subscribers.poll(); // Get the next MicroService in round-robin order
+        } finally {
+            lock.readLock().unlock();
+        }
+
+        // Ensure synchronized access to the queue for round-robin scheduling
+        synchronized (subscribers) {
+            MicroService m = subscribers.poll(); // Get the next MicroService
             if (m != null) {
                 BlockingQueue<Message> queue = microServiceMessageQueue.get(m);
                 if (queue != null) {
@@ -88,9 +97,8 @@ public class MessageBusImpl implements MessageBus {
                 eventFutureMap.put(e, future);
                 return future;
             }
-        } finally {
-            lock.readLock().unlock();
         }
+
         return null; // Return null if no subscriber was found
     }
 

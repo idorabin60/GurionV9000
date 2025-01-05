@@ -23,12 +23,10 @@ public class LiDarWorkerService extends MicroService {
 
         // Subscribe to DetectObjectsEvent
         subscribeEvent(DetectObjectsEvent.class, event -> {
+            System.out.println("Roooooooooooorsh hasha "+event.getDetectedObjects());
             System.out.println(getName() + " received DetectObjectsEvent at tick " + event.getTime());
             lidarTracker.addDetectedObjectsEvent(event);
-
-            if (lidarTracker.getFrequency() == 0) {
-                processAndBroadcastEvents();
-            }
+            processAndBroadcastEvents();
         });
 
         // Subscribe to TickBroadcast
@@ -67,19 +65,20 @@ public class LiDarWorkerService extends MicroService {
     }
 
     private void processAndBroadcastEvents() {
+        System.out.println("Going to send evetns");
         lidarTracker.getReadyEvents().forEach(event -> {
             if (isErrorDetected) {
                 return;
             }
 
             event.getTrackedObjects().forEach(trackedObject -> {
+                System.out.println("tracked object idooooooo " + trackedObject);
                 if (trackedObject.getId().equals("ERROR")) {
                     ErrorOutput.getInstance().setError(this.getName() + " disconnected");
                     ErrorOutput.getInstance().setFaultySensor(this.getName());
                     ErrorOutput.getInstance().addLiDarFrame(this.getName(), this.lidarTracker.getLastTrackedObjects());
                     sendBroadcast(new CrashedBroadcast("LiDarService"));
                     lidarTracker.setStatus(STATUS.ERROR);
-
                     isErrorDetected = true;
                     MessageBusImpl.getInstance().setIsError(true);
                     terminate();
@@ -106,6 +105,7 @@ public class LiDarWorkerService extends MicroService {
 
             if (!isErrorDetected) {
                 sendEvent(event);
+                System.out.println("SENT EVENT AT TICK 111111111");
                 int numberOfTrackedObjectsInEvent = event.getTrackedObjects().size();
                 LiDarDataBase dbInstance = LiDarDataBase.getInstance();
                 dbInstance.setCounterOfTrackedCloudPoints(dbInstance.getCounterOfTrackedCloudPoints().get() - numberOfTrackedObjectsInEvent);
