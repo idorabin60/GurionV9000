@@ -1,5 +1,6 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.DetectObjectsEvent;
@@ -70,6 +71,7 @@ public class CameraService extends MicroService {
                     ErrorOutput.getInstance().addCameraFrame(this.getName(),camera.getLastStampedDetectedObjects());
                     //send crashed Broadcast
                     sendBroadcast(new CrashedBroadcast("CameraService"));
+                    MessageBusImpl.getInstance().setIsError(true);
                     terminate();
                 }
                 else {

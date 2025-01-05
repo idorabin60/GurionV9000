@@ -1,10 +1,12 @@
 package bgu.spl.mics.application.services;
 
+import bgu.spl.mics.MessageBusImpl;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.application.objects.SystemServicesCountDownLatch;
 
 import java.util.Objects;
@@ -38,14 +40,26 @@ public class TimeService extends MicroService {
     @Override
     protected void initialize() {
         subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
+            currentTick++;
             if (currentTick > duration) {
+                System.out.println("Current tick: " + currentTick);
+                System.out.println("Duration: " + duration);
                 sendBroadcast(new TerminatedBroadcast("TimeService"));
                 terminate();
             } else {
                 try {
                     Thread.sleep(tickInterval * 1000);
-                    currentTick++;
-                    sendBroadcast(new TickBroadcast(currentTick));
+                    if (MessageBusImpl.getInstance().getIsError()) {
+                        System.out.println("Error is recived in tick" + currentTick);
+                        System.out.println("Need to end the service in this tick" + currentTick);
+                    } else {
+                        sendBroadcast(new TickBroadcast(currentTick));
+                        System.out.println("Current tick: " + currentTick);
+                        System.out.println("Duration: " + duration);
+                        StatisticalFolder.getInstance().setSystemRuntime(currentTick);
+
+                    }
+
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -66,8 +80,10 @@ public class TimeService extends MicroService {
         try {
             System.out.println("waiting for services to be inited");
             SystemServicesCountDownLatch.getInstance().getCountDownLatch().await();
-            Thread.sleep(500); // Allow other services to settle
+            Thread.sleep(500);
             sendBroadcast(new TickBroadcast(currentTick));
+            StatisticalFolder.getInstance().setSystemRuntime(currentTick);
+
 
         } catch (Exception e) {
             e.printStackTrace();
