@@ -25,10 +25,7 @@ public class LiDarWorkerService extends MicroService {
         subscribeEvent(DetectObjectsEvent.class, event -> {
             System.out.println(getName() + " received DetectObjectsEvent at tick " + event.getTime());
             lidarTracker.addDetectedObjectsEvent(event);
-
-            if (lidarTracker.getFrequency() == 0) {
-                processAndBroadcastEvents();
-            }
+            processAndBroadcastEvents();
         });
 
         // Subscribe to TickBroadcast
