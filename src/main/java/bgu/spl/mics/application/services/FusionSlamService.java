@@ -74,7 +74,6 @@ public class FusionSlamService extends MicroService {
 
         //Subscribe to TerminateBroadcast
         subscribeBroadcast(TerminatedBroadcast.class, (TerminatedBroadcast termBrocast) -> {
-            System.out.println(termBrocast.getSender());
              if (termBrocast.getSender().equals("TimeService") || termBrocast.getSender().equals("PoseService") ) {
                 this.numsOfMainService.addAndGet(-1);
             }
@@ -89,10 +88,8 @@ public class FusionSlamService extends MicroService {
                 if (!fusionSlam.getLandmarks().isEmpty()) {
                     StatisticalFolder.getInstance().setNumLandmarks(fusionSlam.getLandmarks().size());
                 }
-                System.out.println(StatisticalFolder.getInstance().toString());
                 if (thereIsError){
                     FusionSlam.getInstance().setThereIsError(true);
-                    System.out.println("THE SENSOR OF ERROR:" + ErrorOutput.getInstance().getFaultySensor() + " THE ERROR: " + ErrorOutput.getInstance().getError());
                 }
                 terminate();
             }
