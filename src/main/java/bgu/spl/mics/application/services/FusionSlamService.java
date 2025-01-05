@@ -91,8 +91,6 @@ public class FusionSlamService extends MicroService {
         subscribeBroadcast(TickBroadcast.class, tick -> {
             if (numsOfCameras.get() <= 0 && numsOfLiDars.get() <= 0) {
                 sendBroadcast(new TerminatedBroadcast("FusionSlamService"));
-            } else {
-                StatisticalFolder.getInstance().setSystemRuntime(tick.getCurrentTick());
             }
         });
 

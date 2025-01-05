@@ -6,6 +6,7 @@ import bgu.spl.mics.application.messages.CrashedBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.messages.TerminatedBroadcast;
+import bgu.spl.mics.application.objects.StatisticalFolder;
 import bgu.spl.mics.application.objects.SystemServicesCountDownLatch;
 
 import java.util.Objects;
@@ -39,15 +40,16 @@ public class TimeService extends MicroService {
     @Override
     protected void initialize() {
         subscribeBroadcast(TickBroadcast.class, tickBroadcast -> {
-            if (currentTick > duration) {
+            if (currentTick >= duration) {
+                StatisticalFolder.getInstance().setSystemRuntime(currentTick);
                 sendBroadcast(new TerminatedBroadcast("TimeService"));
                 terminate();
             } else {
                 try {
                     Thread.sleep(tickInterval * 1000);
-                    currentTick++;
                     if(!MessageBusImpl.getInstance().getIsError()){
                         sendBroadcast(new TickBroadcast(currentTick));
+                        currentTick++;
                         System.out.println("going to send a tick: " + currentTick);
                     }
 
@@ -73,7 +75,7 @@ public class TimeService extends MicroService {
             System.out.println("waiting for services to be inited");
             SystemServicesCountDownLatch.getInstance().getCountDownLatch().await();
             Thread.sleep(500); // Allow other services to settle
-            sendBroadcast(new TickBroadcast(currentTick));
+            sendBroadcast(new TickBroadcast(1));
 
         } catch (Exception e) {
             e.printStackTrace();

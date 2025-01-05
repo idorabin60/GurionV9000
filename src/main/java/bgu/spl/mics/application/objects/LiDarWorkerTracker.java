@@ -72,6 +72,7 @@ public class LiDarWorkerTracker {
     }
 
     public List<TrackedObjectsEvent> getReadyEvents() {
+        System.out.println(trackedObjectsEventList.size()+"MANCHESTERUUEFJGHKDKFJHKDJFHVKDJHF");
         List<TrackedObjectsEvent> readyEvents = trackedObjectsEventList.stream()
                 .filter(event -> currentTick >= event.getTrackedObjects().get(0).getTime() + frequency)
                 .collect(Collectors.toList());
