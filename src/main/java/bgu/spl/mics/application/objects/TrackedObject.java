@@ -12,6 +12,7 @@ public class TrackedObject {
     private int time;
     private String description;
     private ArrayList<CloudPoint> coordinates;
+    //bla
 
     // Constructor
     public TrackedObject(String id, int time, String description, ArrayList<CloudPoint> coordinates) {
