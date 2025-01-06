@@ -42,7 +42,6 @@ public class CameraService extends MicroService {
      */
     @Override
     protected void initialize() {
-        System.out.println(getName() + " for camera " + camera.getId() + " started");
         camera.setStatus(STATUS.UP);
 
         // Subscribe to TickBroadcast
@@ -56,15 +55,11 @@ public class CameraService extends MicroService {
             } else { //there is data to read and status = up
                 StampedDetectedObjects objectsAtTimeT = camera.getDetectedObjectAtTimeT(currentTick - camera.getFrequency());
                 if (objectsAtTimeT == null) {
-                    /// DELETE THIS PRINT
-                    System.out.println(getName() + " found no detected objects at tick " + currentTick);
                     return; // Skip further processing
                 }
                 //iterate all the objects and see if there is an object of id:ERROR
                 List<DetectedObject> objects = objectsAtTimeT.getDetectedObjects();
                 if (camera.hasError(objects)){
-                    System.out.println(this.currentTick +"tick of the Error");
-                    System.out.println("FOUND AN ERRO CRASH THE SYSTEM");
                     camera.setStatus(STATUS.ERROR);
                     //Update the statistical Folder
                     ErrorOutput.getInstance().setFaultySensor(this.getName());
@@ -79,7 +74,6 @@ public class CameraService extends MicroService {
                     //decrease camera life cycle
                     camera.setLifeCycle(camera.getLifeCycle() - 1);
                     camera.setLastStampedDetectedObjects(objectsAtTimeT);
-                    System.out.println(getName() + " sent DetectObjectsEvent at Tick " + currentTick + " for camera " + camera.getId() +"sum:" + objectsAtTimeT.getDetectedObjects().size());
                     //update the statistical folder
                     StatisticalFolder.getInstance().incrementDetectedObjects(objectsAtTimeT.getDetectedObjects().size());
                     // Send DetectObjectsEvent

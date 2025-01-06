@@ -18,7 +18,7 @@ public class CameraTest {
 
     @BeforeEach
     void setUp() {
-        String configFilePath = "configuration_file.json"; // Replace with actual path
+        String configFilePath = "camera_data.json"; // Replace with actual path
         cameras = new ArrayList<Camera>();
         try {
             // Parse configuration file (directly copied here from Main)
@@ -53,21 +53,20 @@ public class CameraTest {
     @Test
     void testGetDetectedObjectAtTimeT_FirstElement() {
         Camera camera = cameras.get(0);
-        int timeT = 14; // First time in the list (replace with your actual first time)
+        int timeT = 2; // First time in the list (replace with your actual first time)
         StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(timeT);
         // Assertions
         assertNotNull(result, "Result should not be null for the first element");
-        assertEquals(14, result.getTime(), "The returned object's time should match the requested time");
+        assertEquals(2, result.getTime(), "The returned object's time should match the requested time");
         assertEquals(1, result.getDetectedObjects().size(), "The number of detected objects should match");
-        assertEquals("Wall_5", result.getDetectedObjects().get(0).getId(), "The first detected object's ID should match");
+        assertEquals("Wall_1", result.getDetectedObjects().get(0).getId(), "The first detected object's ID should match");
     }
 
     //Test to the method: hasError
     @Test
     public void testHasErrorWithErrorObject() {
         Camera camera = cameras.get(0);
-        int timeT = 1; // First time in the list (replace with your actual first time)
-        List<DetectedObject> temp = camera.getDetectedObjectAtTimeT(timeT).getDetectedObjects();
+        List<DetectedObject> temp = camera.getDetectedObjectAtTimeT(5).getDetectedObjects();
         // Act
         boolean result = camera.hasError(temp);
         // Assert

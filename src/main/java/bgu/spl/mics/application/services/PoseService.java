@@ -43,9 +43,6 @@ public class PoseService extends MicroService {
                 if (currentPose != null) {
                     // Create and send a PoseEvent with the current pose
                     sendEvent(new PoseEvent(currentPose));
-                    System.out.println(getName() + " sent PoseEvent at tick " + currentTick);
-                } else {
-                    System.out.println(getName() + " found no pose for tick " + currentTick);
                 }
             }
             else {
