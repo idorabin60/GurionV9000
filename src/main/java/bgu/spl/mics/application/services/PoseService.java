@@ -71,5 +71,6 @@ public class PoseService extends MicroService {
             }
         });
         SystemServicesCountDownLatch.getInstance().getCountDownLatch().countDown();
+        //blablabla
     }
 }
