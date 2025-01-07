@@ -17,7 +17,13 @@ public class Main {
 
     public static void main(String[] args) {
         // Define configuration file path
-        String configFilePath = "configuration_file.json"; // Replace with the actual path
+        if (args.length < 1) {
+            System.err.println("Usage: java Main <config-file-path>");
+            return;
+        }
+
+        // Get the configuration file path from the arguments
+        String configFilePath = args[0];
 
         try {
             // Parse configuration file
@@ -111,7 +117,7 @@ public class Main {
             }
             else {
                 createOutputJsonFile(fusionSlam, StatisticalFolder.getInstance());
-                System.out.println("Output JSON file created: ido_rabin_output_data.json");
+                System.out.println("Output JSON file created: output_file.json");
             }
 
 
@@ -201,7 +207,7 @@ public class Main {
         });
         outputJson.add("landMarks", landmarksJson);
 
-        try (FileWriter writer = new FileWriter("ido_rabin_output_data.json")) {
+        try (FileWriter writer = new FileWriter("output.json")) {
             gson.toJson(outputJson, writer);
         }
     }
