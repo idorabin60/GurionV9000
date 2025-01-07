@@ -65,20 +65,12 @@ public class GurionRockRunner {
             // Initialize GPSIMU
             GPSIMU gpsimu = initializeGPSIMU(configFilePath);
 
-            System.out.println("Priniting objects:");
-            System.out.println("\n");
-
-            //Check each filed values:
-            System.out.println("\n");
-
 
             System.out.println("Lidars data");
             lidarWorkers.forEach(liDarWorkerTracker -> {
                 System.out.println(liDarWorkerTracker.toString());
             });
-            System.out.println("\n");
-            System.out.println("Lidar DB data");
-//            System.out.println(lidarDataBase.toString());
+
 
             System.out.println("\n");
             System.out.println("GpsData:");
