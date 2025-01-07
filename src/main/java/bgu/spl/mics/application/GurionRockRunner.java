@@ -69,10 +69,6 @@ public class GurionRockRunner {
             System.out.println("\n");
 
             //Check each filed values:
-            System.out.println("Cameras data:");
-            cameras.forEach(camera -> {
-                System.out.println(camera.toString());
-            });
             System.out.println("\n");
 
 
@@ -86,7 +82,6 @@ public class GurionRockRunner {
 
             System.out.println("\n");
             System.out.println("GpsData:");
-            System.out.println(gpsimu.getPoseList().toString());
 
             //Initing the microServicesList
             List<Thread> microserviceThreads = new ArrayList<>();
