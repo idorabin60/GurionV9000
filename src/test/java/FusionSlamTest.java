@@ -1,7 +1,4 @@
-import bgu.spl.mics.application.objects.CloudPoint;
-import bgu.spl.mics.application.objects.FusionSlam;
-import bgu.spl.mics.application.objects.Pose;
-import bgu.spl.mics.application.objects.TrackedObject;
+import bgu.spl.mics.application.objects.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,38 +8,59 @@ import java.util.List;
 
 public class FusionSlamTest {
     private FusionSlam fusionSlam;
-    private TrackedObject trackedObject;
-    private Pose pose;
+    private List<CloudPoint> cloudPoints1;
+    private List<CloudPoint> cloudPoints2;
+    private List<CloudPoint> cloudPoints3;
+    private List<CloudPoint> cloudPoints4;
 
     @BeforeEach
     void setUp() {
-        fusionSlam = new FusionSlam();
-        // Initialize the trackedObject and pose before each test
-        trackedObject = new TrackedObject("test", 1, "unitTest", null);
-        ArrayList<CloudPoint> coordinates = new ArrayList<>();
-        coordinates.add(new CloudPoint(0.1176, 3.6969));
-        trackedObject.setCoordinates(coordinates);
+        fusionSlam = FusionSlam.getInstance();
+        fusionSlam.getLandmarks().clear();
 
-        // Initialize Pose (Assuming Pose has a constructor or setters to set values)
-        pose = new Pose( 2, 3, -1, 1);  // Example values for pose (x, y)
+        cloudPoints1 = new ArrayList<CloudPoint>();
+        cloudPoints1.add(new CloudPoint(0.1176, 3.6969));
+        cloudPoints2 =new ArrayList<CloudPoint>();
+        cloudPoints2.add(new CloudPoint(0.5,3.9));
+        cloudPoints2.add(new CloudPoint(0.2, 3.7));
+        cloudPoints3 = new ArrayList<CloudPoint>();
+        cloudPoints3.add(new CloudPoint(3.1, -0.4));
+        cloudPoints4=new ArrayList<CloudPoint>();
+        cloudPoints4.add(new CloudPoint(-3.6, -1.0));
+        cloudPoints4.add(new CloudPoint(-3.7, -1.1));
+
+        fusionSlam.addPose(new Pose(2, 3, -1, 1));
+        fusionSlam.addPose(new Pose(-3.2076f, 0.0755f,-87.48f,2));
+        fusionSlam.addPose(new Pose( -5.7074f,0.1484f,-92.68f,3 ));
+
+    }
+
+    @Test
+    void testTrackedObjectToGlobalAndUpdateTheLandmarks() {
+        TrackedObject trackedObject1 = new TrackedObject("Wall_1", 1, "Wall", (ArrayList<CloudPoint>) cloudPoints1);
+        fusionSlam.trackedObjectToGlobal(trackedObject1, fusionSlam.getPose(1));
+        assertEquals(2.182101890308385, trackedObject1.getCoordinates().get(0).getX());
+        assertEquals(6.694284541226638, trackedObject1.getCoordinates().get(0).getY());
     }
     @Test
-    void testTrackedObjectToGlobal_UpdatesCoordinates() {
-        fusionSlam.trackedObjectToGlobal(trackedObject, pose);
+    void testUpdateLandMarks() {
+        TrackedObject trackedObject2 = new TrackedObject("Wall_2", 2, "Wall near door", (ArrayList<CloudPoint>) cloudPoints2);
 
-        // Assert: Check if the coordinates have been updated correctly
-        for (CloudPoint point : trackedObject.getCoordinates()) {
-            assertNotEquals(1, point.getX(), "X coordinate should be updated");
-            assertNotEquals(1, point.getY(), "Y coordinate should be updated");
-        }
+        fusionSlam.trackedObjectToGlobal(trackedObject2, fusionSlam.getPose(2));
+        fusionSlam.addLankMark(new LandMark(trackedObject2.getId(), trackedObject2.getDescription(), trackedObject2.getCoordinates()));
+        assertNotNull(fusionSlam.getLankMark("Wall_2"));
+        assertEquals(0.710612368454115, fusionSlam.getLankMark("Wall_2").getCoordinates().get(0).getX());
+        assertEquals(0.49761536306778176, fusionSlam.getLankMark("Wall_2").getCoordinates().get(1).getX());
+
     }
 
     @Test
     void testTrackedObjectToGlobal_CorrectTransformation() {
-        fusionSlam.trackedObjectToGlobal(trackedObject, pose);
-        for (CloudPoint point : trackedObject.getCoordinates()) {
-            assertNotEquals(2.182101890308385, point.getX(), "should be the same");
-            assertNotEquals(6.694284541226638, point.getY(), "should be the same");
+        TrackedObject trackedObject3 = new TrackedObject("Wall_3", 3, "Wall3", (ArrayList<CloudPoint>) cloudPoints3);
+        fusionSlam.trackedObjectToGlobal(trackedObject3, fusionSlam.getPose(3));
+        for (CloudPoint point: trackedObject3.getCoordinates()) {
+            assertNotEquals(2.182101890308385, point.getX());
+            assertNotEquals(6.694284541226638, point.getY());
         }
     }
 }

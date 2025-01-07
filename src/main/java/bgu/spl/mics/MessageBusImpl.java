@@ -131,11 +131,20 @@ public class MessageBusImpl implements MessageBus {
         }
         return queue.take(); // Wait for the next message
     }
+
     public boolean getIsError() {
         return isError;
     }
+
     public void setIsError(boolean isError) {
         this.isError = isError;
+    }
+    public ConcurrentHashMap<MicroService, BlockingQueue<Message>> getMicroServiceQueue() {
+        return microServiceMessageQueue;
+    }
+
+    public ConcurrentHashMap<Class<? extends Broadcast>, CopyOnWriteArrayList<MicroService>> getBroadcastSubscriptions() {
+        return this.broadcastSubscriptions;
     }
 
 }

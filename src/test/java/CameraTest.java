@@ -1,7 +1,4 @@
-import bgu.spl.mics.application.objects.Camera;
-import bgu.spl.mics.application.objects.CameraDataUpdater;
-import bgu.spl.mics.application.objects.DetectedObject;
-import bgu.spl.mics.application.objects.StampedDetectedObjects;
+import bgu.spl.mics.application.objects.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,62 +11,66 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CameraTest {
-    private List<Camera> cameras;
+    private Camera camera;
 
     @BeforeEach
     void setUp() {
-        String configFilePath = "camera_data.json"; // Replace with actual path
-        cameras = new ArrayList<Camera>();
-        try {
-            // Parse configuration file (directly copied here from Main)
-            Gson gson = new Gson();
-            JsonObject config = gson.fromJson(new FileReader(configFilePath), JsonObject.class);
+        List<StampedDetectedObjects> listDetectedObjects = new ArrayList<>();
 
-            // Initialize cameras from configuration
-            cameras = CameraDataUpdater.initializeCamerasFromConfig(configFilePath);
-            CameraDataUpdater.updateCamerasFromJson(cameras, configFilePath);
-        } catch (IOException e) {
-            fail("Failed to initialize cameras from configuration: " + e.getMessage());
-        }
+        List<DetectedObject> objects1 = new ArrayList<>();
+        objects1.add(new DetectedObject("Wall_1", "DafnaRoom"));
+        objects1.add(new DetectedObject("Wall_2", "IdoRoom"));
+        StampedDetectedObjects temp = new StampedDetectedObjects(1, objects1);
+        listDetectedObjects.add(temp);
+
+
+        List<DetectedObject> objects2 = new ArrayList<>();
+        objects2.add(new DetectedObject("ERROR", "Camera Dissconect"));
+        StampedDetectedObjects errorStamped = new StampedDetectedObjects(2, objects2);
+        listDetectedObjects.add(errorStamped);
+
+        List<DetectedObject> objects3 = new ArrayList<>();
+        objects3.add(new DetectedObject("Chair_1", "nana"));
+        objects3.add(new DetectedObject("Chair_2", "banana"));
+        StampedDetectedObjects s4 = new StampedDetectedObjects(4, objects3);
+        listDetectedObjects.add(s4);
+
+        camera = new Camera(1, 0, STATUS.UP);
+        camera.updateDetectedObjects(listDetectedObjects);
     }
 
     //Tests to the method: getDetectedObjectAtTimeT
     @Test
     void testGetDetectedObjectAtTimeT_ValidTime() {
-        Camera camera = cameras.get(0);
-        int timeT = 1;
-        StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(timeT);
-        assertNotNull(result, "Result should not be null for a valid time");
+        StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(1);
+        assertNotNull(result);
     }
 
     @Test
     void testGetDetectedObjectAtTimeT_InvalidTime() {
-        Camera camera = cameras.get(0);
-        int timeT = -1; // Invalid time
-        StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(timeT);
-        assertNull(result, "Result should be null for an invalid time");
+        StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(-1);
+        assertNull(result);
+        result = camera.getDetectedObjectAtTimeT(3);
+        assertNull(result);
     }
 
     @Test
     void testGetDetectedObjectAtTimeT_FirstElement() {
-        Camera camera = cameras.get(0);
-        int timeT = 2; // First time in the list (replace with your actual first time)
-        StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(timeT);
-        // Assertions
-        assertNotNull(result, "Result should not be null for the first element");
-        assertEquals(2, result.getTime(), "The returned object's time should match the requested time");
-        assertEquals(1, result.getDetectedObjects().size(), "The number of detected objects should match");
-        assertEquals("Wall_1", result.getDetectedObjects().get(0).getId(), "The first detected object's ID should match");
+        StampedDetectedObjects result = camera.getDetectedObjectAtTimeT(1);
+
+        assertNotNull(result);
+        assertFalse(camera.hasError(result.getDetectedObjects()));
+        assertEquals(1, result.getTime());
+        assertEquals(2, result.getDetectedObjects().size());
+        assertEquals("Wall_1", result.getDetectedObjects().get(0).getId());
+        assertEquals("DafnaRoom", result.getDetectedObjects().get(0).getDescription());
+        assertEquals("Wall_2", result.getDetectedObjects().get(1).getId());
+        assertEquals("IdoRoom", result.getDetectedObjects().get(1).getDescription());
     }
 
     //Test to the method: hasError
     @Test
     public void testHasErrorWithErrorObject() {
-        Camera camera = cameras.get(0);
-        List<DetectedObject> temp = camera.getDetectedObjectAtTimeT(5).getDetectedObjects();
-        // Act
-        boolean result = camera.hasError(temp);
-        // Assert
-        assertTrue(result, "The method should return true when an object with id 'ERROR' is found.");
+        assertTrue(camera.hasError(camera.getDetectedObjectAtTimeT(2).getDetectedObjects()));
     }
 }
