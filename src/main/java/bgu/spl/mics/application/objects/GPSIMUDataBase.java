@@ -1,7 +1,7 @@
 package bgu.spl.mics.application.objects;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.FileReader;
@@ -31,20 +31,10 @@ public class GPSIMUDataBase {
         return SingletonHolder.INSTANCE;
     }
 
-    // Method to initialize the GPSIMUDataBase with data from the configuration file
-    public void initialize(String configFilePath) {
-        try (FileReader configReader = new FileReader(configFilePath)) {
-            Gson gson = new Gson();
-
-            // Parse the main config file
-            JsonObject config = gson.fromJson(configReader, JsonObject.class);
-            String poseDataPath = config.get("poseJsonFile").getAsString();
-
-            // Load the Pose data from the specified path
-            loadPoseData(poseDataPath);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load configuration file: " + configFilePath, e);
-        }
+    // Method to initialize the GPSIMUDataBase with data from the Pose file
+    public void initialize(String poseDataPath) {
+        // Load the Pose data directly from the specified path
+        loadPoseData(poseDataPath);
     }
 
     // Loads the Pose data from the specified file into the GPSIMU's PoseList
@@ -53,11 +43,18 @@ public class GPSIMUDataBase {
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<Pose>>() {}.getType();
 
+            // Parse the JSON array from the file
             ArrayList<Pose> poseList = gson.fromJson(poseReader, listType);
+
+            if (poseList == null || poseList.isEmpty()) {
+                throw new RuntimeException("Pose data file is empty or has invalid format: " + poseDataPath);
+            }
 
             // Set the PoseList field in the GPSIMU instance
             gpsimu.setPoseList(poseList);
 
+        } catch (JsonSyntaxException e) {
+            throw new RuntimeException("Invalid JSON format in Pose data file: " + poseDataPath, e);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load GPS/IMU Pose data from file: " + poseDataPath, e);
         }
