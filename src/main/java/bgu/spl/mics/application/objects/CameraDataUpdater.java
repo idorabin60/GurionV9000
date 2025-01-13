@@ -57,10 +57,10 @@ public class CameraDataUpdater {
 
             // Parse the configuration file to get the camera data path
             JsonObject config = gson.fromJson(configReader, JsonObject.class);
-            String cameraDataPath = config.getAsJsonObject("Cameras").get("camera_datas_path").getAsString();
+            String cameraDataPath = config.getAsJsonObject("Cameras").get("camera_datas_path").getAsString().substring(1);
 
             // Read and parse the camera data JSON file
-            try (FileReader cameraDataReader = new FileReader(cameraDataPath)) {
+            try (FileReader cameraDataReader = new FileReader(configFilePath.substring(0,configFilePath.lastIndexOf('/'))+cameraDataPath)) {
                 JsonObject cameraDataJson = gson.fromJson(cameraDataReader, JsonObject.class);
 
                 // Process each camera key

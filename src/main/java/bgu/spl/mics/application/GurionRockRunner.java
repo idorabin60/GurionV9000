@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,18 +41,20 @@ public class GurionRockRunner {
 
         // Get the configuration file path from the arguments
         String configFilePath = args[0];
-
+        String configDir = new File(configFilePath).getParent(); // Extract directory path
+        String abspath = args[0].substring(0, args[0].lastIndexOf('/'));
         try {
             // Parse configuration file
             JsonObject config = parseConfigFile(configFilePath);
             int tickTime = config.get("TickTime").getAsInt();
             int duration = config.get("Duration").getAsInt();
             System.out.println("TickTime: " + tickTime);
-            String lidarDataPath = config.getAsJsonObject("LiDarWorkers").get("lidars_data_path").getAsString();
+            String lidarDataPath = config.getAsJsonObject("LiDarWorkers").get("lidars_data_path").getAsString().substring(1);
+            System.out.println("LidarDataPath: " + lidarDataPath);
             System.out.println("Attempting to load LiDAR data from: " + lidarDataPath);
 
             //init Lidar DB
-            LiDarDataBase lidarDataBase = loadLidarData(lidarDataPath);
+            LiDarDataBase lidarDataBase = loadLidarData(abspath + lidarDataPath);
             lidarDataBase.setCounterOfTrackedCloudPoints(LiDarDataBase.getInstance().getCloudPoints().size());
             System.out.println("lidar db counter!!!:" + LiDarDataBase.getInstance().getCounterOfTrackedCloudPoints());
 
@@ -116,9 +119,9 @@ public class GurionRockRunner {
             System.out.println("finisheddd");
 
             if (FusionSlam.getInstance().isThereIsError()) {
-                ErrorOutput.getInstance().createErrorOutputFile();
+                ErrorOutput.getInstance().createErrorOutputFile(configDir); // Pass configDir to ErrorOutput
             } else {
-                createOutputJsonFile(fusionSlam, StatisticalFolder.getInstance());
+                createOutputJsonFile(fusionSlam, StatisticalFolder.getInstance(), configDir);
                 System.out.println("Output JSON file created: output_file.json");
             }
 
@@ -180,9 +183,11 @@ public class GurionRockRunner {
         e.printStackTrace();
     }
 
-    private static void createOutputJsonFile(FusionSlam fusionSlam, StatisticalFolder statisticalFolder) throws IOException {
+    private static void createOutputJsonFile(FusionSlam fusionSlam, StatisticalFolder statisticalFolder, String dirPath) throws IOException {
         Gson gson = new Gson();
         JsonObject outputJson = new JsonObject();
+        File outputFile = new File(dirPath, "output_file.json"); // Save to specified directory
+
 
         outputJson.addProperty("systemRuntime", statisticalFolder.getSystemRuntime());
         outputJson.addProperty("numDetectedObjects", statisticalFolder.getNumDetectedObjects());
@@ -209,7 +214,7 @@ public class GurionRockRunner {
         });
         outputJson.add("landMarks", landmarksJson);
 
-        try (FileWriter writer = new FileWriter("output_file.json")) {
+        try (FileWriter writer = new FileWriter(outputFile)) {
             gson.toJson(outputJson, writer);
         }
     }

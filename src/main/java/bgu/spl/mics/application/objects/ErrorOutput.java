@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,14 +71,11 @@ public class ErrorOutput {
         return poses;
     }
 
-    public void createErrorOutputFile() {
+    public void createErrorOutputFile(String baseDir) {
         Gson gson = new Gson();
-        String filePath = "ido_rabin_error.json";
+        File outputFile = new File(baseDir, "ido_rabin_error.json"); // Save to specified directory
 
-        StatisticalFolder stats = StatisticalFolder.getInstance();
-        FusionSlam fusionSlam = FusionSlam.getInstance();
-
-        try (FileWriter writer = new FileWriter(filePath)) {
+        try (FileWriter writer = new FileWriter(outputFile)) {
             JsonObject output = new JsonObject();
 
             // Add faultySensor and error
@@ -86,12 +84,16 @@ public class ErrorOutput {
 
             // Add lastCamerasFrame
             JsonObject camerasFrame = new JsonObject();
-            this.lastFramesCameras.forEach((name, frame) -> camerasFrame.add(name, gson.toJsonTree(frame)));
+            this.lastFramesCameras.forEach((name, frame) ->
+                    camerasFrame.add(name, gson.toJsonTree(frame))
+            );
             output.add("lastCamerasFrame", camerasFrame);
 
             // Add lastLiDarWorkerTrackersFrame
             JsonObject lidarFrame = new JsonObject();
-            this.lastFramesLiDars.forEach((name, frames) -> lidarFrame.add(name, gson.toJsonTree(frames)));
+            this.lastFramesLiDars.forEach((name, frames) ->
+                    lidarFrame.add(name, gson.toJsonTree(frames))
+            );
             output.add("lastLiDarWorkerTrackersFrame", lidarFrame);
 
             // Add poses
@@ -101,23 +103,26 @@ public class ErrorOutput {
 
             // Add statistics
             JsonObject statistics = new JsonObject();
-            statistics.addProperty("systemRuntime", stats.getSystemRuntime());
-            statistics.addProperty("numDetectedObjects", stats.getNumDetectedObjects());
-            statistics.addProperty("numTrackedObjects", stats.getNumTrackedObjects());
-            statistics.addProperty("numLandmarks", stats.getNumLandmarks());
+            statistics.addProperty("systemRuntime", StatisticalFolder.getInstance().getSystemRuntime());
+            statistics.addProperty("numDetectedObjects", StatisticalFolder.getInstance().getNumDetectedObjects());
+            statistics.addProperty("numTrackedObjects", StatisticalFolder.getInstance().getNumTrackedObjects());
+            statistics.addProperty("numLandmarks", StatisticalFolder.getInstance().getNumLandmarks());
 
-            // Add landmarks to statistics
+            // Add landmarks
             JsonObject landmarks = new JsonObject();
-            fusionSlam.getLandmarks().forEach(landMark -> landmarks.add(landMark.getId(), gson.toJsonTree(landMark)));
+            FusionSlam.getInstance().getLandmarks().forEach(landMark ->
+                    landmarks.add(landMark.getId(), gson.toJsonTree(landMark))
+            );
             statistics.add("landMarks", landmarks);
 
             output.add("statistics", statistics);
 
             // Write JSON to file
             writer.write(gson.toJson(output));
-            System.out.println("Error output file created successfully: " + filePath);
+            System.out.println("Error output file created successfully at: " + outputFile.getAbsolutePath());
         } catch (IOException e) {
             System.err.println("Failed to write error output file: " + e.getMessage());
         }
     }
+
 }

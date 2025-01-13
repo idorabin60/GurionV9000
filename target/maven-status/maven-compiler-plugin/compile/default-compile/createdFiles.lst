@@ -28,7 +28,6 @@ bgu/spl/mics/application/GurionRockRunner.class
 bgu/spl/mics/application/objects/CameraDataUpdater$2.class
 bgu/spl/mics/application/objects/GPSIMUDataBase$1.class
 bgu/spl/mics/application/objects/LiDarDataBase.class
-bgu/spl/mics/application/objects/Main.class
 bgu/spl/mics/application/objects/FusionSlam$FusionSlamHolder.class
 bgu/spl/mics/application/objects/SystemServicesCountDownLatch.class
 bgu/spl/mics/application/objects/Pose.class
@@ -37,13 +36,11 @@ bgu/spl/mics/MessageBus.class
 bgu/spl/mics/application/messages/PoseEvent.class
 bgu/spl/mics/application/objects/LiDarDataBase$SingletonHolder.class
 bgu/spl/mics/Message.class
-bgu/spl/mics/application/objects/Main$2.class
 bgu/spl/mics/application/messages/TerminatedBroadcast.class
 bgu/spl/mics/application/objects/DetectedObject.class
 bgu/spl/mics/application/objects/ErrorOutput$SingletonHolder.class
 bgu/spl/mics/application/objects/CameraDataUpdater$3.class
 bgu/spl/mics/application/objects/StatisticalFolder.class
-bgu/spl/mics/application/objects/Main$1.class
 bgu/spl/mics/Broadcast.class
 bgu/spl/mics/application/objects/STATUS.class
 bgu/spl/mics/application/objects/StatisticalFolder$SingletonHolder.class

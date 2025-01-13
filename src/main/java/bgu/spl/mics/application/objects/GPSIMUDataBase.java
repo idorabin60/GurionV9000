@@ -38,10 +38,10 @@ public class GPSIMUDataBase {
 
             // Parse the main config file
             JsonObject config = gson.fromJson(configReader, JsonObject.class);
-            String poseDataPath = config.get("poseJsonFile").getAsString();
+            String poseDataPath = config.get("poseJsonFile").getAsString().substring(1);
 
             // Load the Pose data from the specified path
-            loadPoseData(poseDataPath);
+            loadPoseData(configFilePath.substring(0,configFilePath.lastIndexOf('/'))+poseDataPath);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load configuration file: " + configFilePath, e);
         }
